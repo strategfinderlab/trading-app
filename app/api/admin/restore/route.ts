@@ -18,21 +18,17 @@ export async function POST(req: Request) {
       },
     });
 
-    const text = await res.text();
-    const backup = JSON.parse(text);
+    const backup = JSON.parse(await res.text());
 
     let rows: any[] = [];
 
-    // 🔥 soporta TODOS los formatos posibles
     if (Array.isArray(backup)) {
       for (const item of backup) {
-
         if (item.data && Array.isArray(item.data)) {
           rows.push(...item.data);
         } else {
           rows.push(item);
         }
-
       }
     } else if (backup.entradas) {
       rows = backup.entradas;
@@ -40,18 +36,22 @@ export async function POST(req: Request) {
 
     console.log("TOTAL ROWS:", rows.length);
 
-    // ⚠️ NO BORRAR (seguridad)
-    // await pool.query("DELETE FROM entradas");
-
-    for (const row of rows) {
-
-      await pool.query(
-        `INSERT INTO entradas (data) VALUES ($1)`,
-        [row]
-      );
+    if (rows.length === 0) {
+      throw new Error("No data to restore");
     }
 
-    console.log("✅ RESTORE COMPLETED");
+    // ⚠️ NO BORRAR (todavía)
+    // await pool.query("DELETE FROM entradas");
+
+    // 🔥 INSERT MASIVO
+    const values = rows.map((row, i) => `($${i + 1})`).join(",");
+
+    await pool.query(
+      `INSERT INTO entradas (data) VALUES ${values}`,
+      rows
+    );
+
+    console.log("✅ RESTORE DONE");
 
     return NextResponse.json({ success: true });
 
