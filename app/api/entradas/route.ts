@@ -31,8 +31,10 @@ export async function GET() {
   const rows = [];
 
   for (const row of result.rows) {
+
     let d = row.data;
 
+    // 🔥 caso: viene como string
     if (typeof d === "string") {
       try {
         d = JSON.parse(d);
@@ -41,10 +43,10 @@ export async function GET() {
       }
     }
 
-    // 🔥 IMPORTANTE: convertir a objeto plano
-    if (Array.isArray(d)) {
-      rows.push(...d);
-    } else if (typeof d === "object" && d !== null) {
+    // 🔥 CLAVE: si tiene .data dentro → usarlo
+    if (d && typeof d === "object" && d.data) {
+      rows.push(d.data);
+    } else {
       rows.push(d);
     }
   }
