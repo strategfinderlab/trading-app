@@ -29,22 +29,31 @@ export async function GET() {
     return NextResponse.json([]);
   }
 
-  // 🔥 juntar todos los registros
-  const allData = result.rows.flatMap(row => {
-    const d = row.data;
+  const cleaned = [];
+
+  for (const row of result.rows) {
+    let d = row.data;
 
     if (typeof d === "string") {
       try {
-        return JSON.parse(d);
+        d = JSON.parse(d);
       } catch {
-        return [];
+        continue;
       }
     }
 
-    return Array.isArray(d) ? d : [d];
-  });
+    // 🔥 caso 1: objeto normal
+    if (!Array.isArray(d)) {
+      cleaned.push(d);
+    }
 
-  return NextResponse.json(allData);
+    // 🔥 caso 2: array dentro
+    else {
+      cleaned.push(...d);
+    }
+  }
+
+  return NextResponse.json(cleaned);
 }
 
 
