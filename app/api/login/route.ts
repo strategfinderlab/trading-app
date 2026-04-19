@@ -18,7 +18,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Usuario no existe" }, { status: 401 });
   }
 
-  const user = result.rows[0];
+  const user = result.rows;
 
   // 🔥 PRIMER LOGIN
   if (!user.password) {

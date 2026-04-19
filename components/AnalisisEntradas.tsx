@@ -80,7 +80,7 @@ export default function AnalisisEntradas() {
           "Filtro 1","Filtro 2","Contabilizar","MIX"
         ];
 
-        const strategies = Object.keys(rows[0])
+        const strategies = Object.keys(rows)
           .filter(k => !columnasBase.includes(k) && k !== "id");
 
         const mejoresCalc = calcularMejores(rows, strategies);

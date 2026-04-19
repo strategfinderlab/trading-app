@@ -32,8 +32,6 @@ export default function AdminPage() {
   const handleCreate = async () => {
     if (!username) return;
 
-    console.log("CLICK crear usuario"); // 👈 añade esto
-
     const res = await fetch("/api/admin/create-user", {
       method: "POST",
       headers: {
@@ -42,10 +40,7 @@ export default function AdminPage() {
       body: JSON.stringify({ username }),
     });
 
-    console.log("STATUS:", res.status); // 👈 añade esto
-
     const data = await res.json();
-    console.log("RESPONSE:", data); // 👈 añade esto
 
     if (data.error) {
       alert(data.error);
