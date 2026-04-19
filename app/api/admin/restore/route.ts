@@ -4,6 +4,9 @@ import { Pool } from "pg";
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
+export async function POST(req: Request) {
+  return new Response("RESTORE OK");
+}
 
 export async function POST(req: Request) {
 
