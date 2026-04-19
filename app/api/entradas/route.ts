@@ -14,36 +14,37 @@ export async function GET() {
   const cookieStore = await cookies();
   const user = cookieStore.get("user")?.value;
 
-  console.log("👉 USER COOKIE:", user);   // 🔥 DEBUG 1
-
   if (!user) {
-    console.log("❌ NO USER EN COOKIE");
     return NextResponse.json([]);
   }
 
   const result = await pool.query(
     `SELECT data FROM entradas 
      WHERE LOWER(username)=LOWER($1)
-     ORDER BY id DESC LIMIT 1`,
+     ORDER BY id DESC`,
     [user]
   );
 
-  console.log("👉 RESULT DB:", result.rows);  // 🔥 DEBUG 2
-
   if (result.rows.length === 0) {
-    console.log("❌ NO HAY DATOS EN BD");
     return NextResponse.json([]);
   }
 
-  const data = result.rows[0].data;
+  // 🔥 juntar todos los registros
+  const allData = result.rows.flatMap(row => {
+    const d = row.data;
 
-  console.log("👉 DATA RAW:", data); // 🔥 DEBUG 3
+    if (typeof d === "string") {
+      try {
+        return JSON.parse(d);
+      } catch {
+        return [];
+      }
+    }
 
-  if (typeof data === "string") {
-    return NextResponse.json(JSON.parse(data));
-  }
+    return Array.isArray(d) ? d : [d];
+  });
 
-  return NextResponse.json(Array.isArray(data) ? data : []);
+  return NextResponse.json(allData);
 }
 
 
