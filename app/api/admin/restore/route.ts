@@ -67,8 +67,10 @@ export async function POST(req: Request) {
 
     for (const row of entradas) {
 
-      const keys = Object.keys(row);
-      const values = Object.values(row);
+      const keys = Object.keys(row).filter(k => k !== "id");
+      const values = Object.values(row).map(v =>
+        v === null || v === undefined ? null : String(v)
+      );
 
       console.log("INSERT ROW:", keys);
 
