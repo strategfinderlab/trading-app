@@ -16,7 +16,11 @@ export async function POST(req: Request) {
   try {
     const { url } = await req.json();
 
-    const res = await fetch(url);
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}`,
+      },
+    });
 
     console.log("FETCH STATUS:", res.status);
 
