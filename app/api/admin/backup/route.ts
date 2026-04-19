@@ -42,7 +42,8 @@ export async function GET(req: Request) {
       url: blob.url
     });
 
-  } catch (err) {
-    return NextResponse.json({ error: "backup error" }, { status: 500 });
+  } catch (err: any) {
+    console.error("BACKUP ERROR:", err);
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
