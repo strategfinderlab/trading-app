@@ -75,7 +75,7 @@ export async function POST(req: Request) {
         });
 
         const query = `
-          INSERT INTO entradas (${keys.join(",")})
+          INSERT INTO entradas (${keys.map(k => `"${k}"`).join(",")})
           VALUES (${keys.map((_, i) => `$${i + 1}`).join(",")})
         `;
 
