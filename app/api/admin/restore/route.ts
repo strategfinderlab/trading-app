@@ -25,7 +25,7 @@ export async function POST(req: Request) {
       ? backup
       : backup.entradas;
 
-    await pool.query("DELETE FROM entradas");
+    //await pool.query("DELETE FROM entradas");
 
     for (const group of entradas) {
 
