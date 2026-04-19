@@ -4,11 +4,11 @@ import { list } from "@vercel/blob";
 export async function GET(req: Request) {
 
   // 🔐 seguridad (igual que backup)
-  const auth = req.headers.get("authorization");
+  //const auth = req.headers.get("authorization");
 
-  if (auth !== `Bearer ${process.env.BACKUP_SECRET}`) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  //if (auth !== `Bearer ${process.env.BACKUP_SECRET}`) {
+    //return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  //}
 
   try {
     const blobs = await list();
