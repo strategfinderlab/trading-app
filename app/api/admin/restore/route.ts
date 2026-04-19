@@ -21,24 +21,37 @@ export async function POST(req: Request) {
     const text = await res.text();
     const backup = JSON.parse(text);
 
-    const entradas = Array.isArray(backup)
-      ? backup
-      : backup.entradas;
+    let rows: any[] = [];
 
-    //await pool.query("DELETE FROM entradas");
+    // 🔥 soporta TODOS los formatos posibles
+    if (Array.isArray(backup)) {
+      for (const item of backup) {
 
-    for (const group of entradas) {
+        if (item.data && Array.isArray(item.data)) {
+          rows.push(...item.data);
+        } else {
+          rows.push(item);
+        }
 
-      if (!group.data) continue;
-
-      for (const row of group.data) {
-
-        await pool.query(
-          `INSERT INTO entradas (data) VALUES ($1)`,
-          [row] // 👈 JSON directo
-        );
       }
+    } else if (backup.entradas) {
+      rows = backup.entradas;
     }
+
+    console.log("TOTAL ROWS:", rows.length);
+
+    // ⚠️ NO BORRAR (seguridad)
+    // await pool.query("DELETE FROM entradas");
+
+    for (const row of rows) {
+
+      await pool.query(
+        `INSERT INTO entradas (data) VALUES ($1)`,
+        [row]
+      );
+    }
+
+    console.log("✅ RESTORE COMPLETED");
 
     return NextResponse.json({ success: true });
 
