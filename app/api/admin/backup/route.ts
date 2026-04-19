@@ -12,11 +12,11 @@ export async function GET(req: Request) {
   const isCron = req.headers.get("user-agent")?.includes("vercel");
 
   if (!isCron) {
-   // const auth = req.headers.get("authorization");
+    const auth = req.headers.get("authorization");
 
-    //if (auth !== `Bearer ${process.env.BACKUP_SECRET}`) {
-     // return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-    //}
+    if (auth !== `Bearer ${process.env.BACKUP_SECRET}`) {
+      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+    }
   }
 
   try {
