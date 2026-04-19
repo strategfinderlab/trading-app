@@ -50,6 +50,20 @@ export async function GET() {
       rows.push(d);
     }
   }
+  // 🔥 ORDENAR POR FECHA (de más antigua a más nueva)
+  rows.sort((a, b) => {
+    const parseDate = (str: string) => {
+      if (!str) return 0;
+
+      // formato: "29/04/2025 15:00"
+      const [date, time] = str.split(" ");
+      const [day, month, year] = date.split("/");
+
+      return new Date(`${year}-${month}-${day}T${time || "00:00"}`).getTime();
+    };
+
+    return parseDate(a["Fecha"]) - parseDate(b["Fecha"]);
+  });
 
   return NextResponse.json(rows);
 }
