@@ -4,17 +4,8 @@ import { Pool } from "pg";
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
-export async function POST(req: Request) {
-  return new Response("RESTORE OK");
-}
 
 export async function POST(req: Request) {
-
-  //const auth = req.headers.get("authorization");
-
-  //if (auth !== `Bearer ${process.env.BACKUP_SECRET}`) {
-    //return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  //}
 
   try {
     const { url } = await req.json();
@@ -36,7 +27,6 @@ export async function POST(req: Request) {
 
     const entradas = Array.isArray(backup) ? backup : backup.entradas;
 
-    // ⚠️ BORRAR TODO
     await pool.query("DELETE FROM entradas");
 
     for (const row of entradas) {
@@ -54,7 +44,8 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: true });
 
-  } catch (err) {
-    return NextResponse.json({ error: "restore error" }, { status: 500 });
+  } catch (err: any) {
+    console.error("RESTORE ERROR:", err);
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
