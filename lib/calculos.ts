@@ -8,12 +8,12 @@ export const getStrategies = (data: any[]) => {
 
   if (!data.length) return [];
 
-  return Object.keys(data).filter(k =>
+  return Object.keys(data[0]).filter(k =>
     !base.includes(k) &&
     k !== "id" &&
     k !== "ID" &&
     k !== "Id" &&
-    typeof data[k] !== "object"
+    typeof data[0][k] !== "object"
   );
 };
 
