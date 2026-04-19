@@ -13,17 +13,24 @@ export async function GET(req: Request) {
 
   if (!isCron) {
     const auth = req.headers.get("authorization");
-  
+
     if (auth !== `Bearer ${process.env.BACKUP_SECRET}`) {
       return NextResponse.json({ error: "unauthorized" }, { status: 401 });
     }
   }
 
   try {
-    const result = await pool.query("SELECT * FROM entradas");
-    const data = result.rows;
+    // 👉 puedes añadir más tablas aquí
+    const entradas = await pool.query("SELECT * FROM entradas");
+    // const usuarios = await pool.query("SELECT * FROM users");
 
-    const date = new Date().toISOString();
+    const data = {
+      entradas: entradas.rows,
+      // usuarios: usuarios.rows
+    };
+
+    // 🔥 evitar ":" en nombre (problemas en algunos sistemas)
+    const date = new Date().toISOString().replace(/[:.]/g, "-");
     const filename = `backup-${date}.json`;
 
     const blob = await put(filename, JSON.stringify(data), {
