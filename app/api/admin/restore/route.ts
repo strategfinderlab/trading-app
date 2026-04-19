@@ -1,51 +1,7 @@
 import { NextResponse } from "next/server";
 import { Pool } from "pg";
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
 
-export async function POST(req: Request) {
-
-  try {
-    const { url } = await req.json();
-
-    const res = await fetch(url, {
-      headers: {
-        Authorization: `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}`,
-      },
-    });
-
-    console.log("FETCH STATUS:", res.status);
-
-    const text = await res.text();
-    console.log("RAW RESPONSE:", text);
-
-    const backup = JSON.parse(text);
-
-    console.log("PARSED BACKUP:", backup);
-
-    const entradas = Array.isArray(backup) ? backup : backup.entradas;
-
-    await pool.query("DELETE FROM entradas");
-
-    for (const row of entradas) {
-
-      const keys = Object.keys(row);
-      const values = Object.values(row);
-
-      const query = `
-        INSERT INTO entradas (${keys.join(",")})
-        VALUES (${keys.map((_, i) => `$${i + 1}`).join(",")})
-      `;
-
-      await pool.query(query, values);
-    }
-
-    return NextResponse.json({ success: true });
-
-  } catch (err: any) {
-    console.error("RESTORE ERROR:", err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
-  }
+export async function POST() {
+  return new Response("OK");
 }
