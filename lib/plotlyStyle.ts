@@ -11,7 +11,7 @@ export const getPlotlyLayout = (titulo: string, valores?: number[]) => {
     title: {
       text: titulo,
       x: 0.5,
-      xanchor: "center",
+      xanchor: "center" as const,
       font: { size: 18, color: "#d4af37" }
     },
 
@@ -45,7 +45,7 @@ export const getPlotlyLayout = (titulo: string, valores?: number[]) => {
       zerolinecolor: "#bbbbbb",
       zerolinewidth: 3,
 
-      tickmode: "linear",
+      tickmode: "linear" as const,
       dtick,
       tickfont: { size: 14, color: "#f5d27a" }
     }

@@ -1,15 +1,24 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import SLChart from "../../../components/charts/SLChart";
-import DuracionChart from "../../../components/charts/DuracionChart";
+import dynamic from "next/dynamic";
+
+const SLChart = dynamic(
+  () => import("../../../components/charts/SLChart"),
+  { ssr: false }
+);
+
+const DuracionChart = dynamic(
+  () => import("../../../components/charts/DuracionChart"),
+  { ssr: false }
+);
 import { getStrategies, calcularMejores } from "../../../lib/calculos";
 import { normalizarDia } from "../../../lib/calculos";
 export default function AnalisisPage() {
 
   const [data, setData] = useState<any[]>([]);
   const [estrategias, setEstrategias] = useState<string[]>([]);
-  const [mejores, setMejores] = useState<any>({});
+  const [mejores, setMejores] = useState<Record<string, string>>({});
   const procesarDatos = (d: any[]) => {
 
     if (!Array.isArray(d)) return;

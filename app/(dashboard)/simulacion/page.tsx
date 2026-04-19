@@ -2,7 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { calcularMontecarlo } from "@/lib/montecarlo";
-import MontecarloChart from "@/components/charts/MontecarloChart";
+import dynamic from "next/dynamic";
+
+const MontecarloChart = dynamic(
+  () => import("../../../components/charts/MontecarloChart"),
+  { ssr: false }
+);
 
 function avg(arr:number[]){
   return arr.reduce((a,b)=>a+b,0)/arr.length;

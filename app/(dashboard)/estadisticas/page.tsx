@@ -25,8 +25,13 @@ export default function EstadisticasPage() {
 
   const procesar = (data: any[]) => {
     const res = calcularEstadisticas(data);
-    res.rawData = data;
-    setStats(res);
+
+    if (!res) return;
+
+    setStats({
+      ...res,
+      rawData: data
+    });
   };
 
   if (!stats) return null;
@@ -37,12 +42,12 @@ export default function EstadisticasPage() {
 
   const direccion = calcularDireccion(
     data,
-    estrategias.filter(e => e !== "MIX")
+    estrategias.filter((e: string) => e !== "MIX")
   );
 
   const metricas = calcularMetricas(
     data,
-    estrategias.filter(e => e !== "MIX")
+    estrategias.filter((e: string) => e !== "MIX")
   );
   const filtros = calcularFiltros(data);
 
@@ -61,7 +66,7 @@ export default function EstadisticasPage() {
           <thead>
             <tr className="bg-[#2c3e50] text-white">
               <th className="px-4 py-2 border border-[#444]">Estrategia</th>
-              {dias.map(d => (
+              {dias.map((d: string) => (
                 <th key={d} className="px-4 py-2 border border-[#444]">{d}</th>
               ))}
               <th className="px-4 py-2 border border-[#444]">TOTAL</th>
@@ -87,7 +92,7 @@ export default function EstadisticasPage() {
             </tr>
 
             {/* ESTRATEGIAS */}
-            {estrategias.map(est => (
+            {estrategias.map((est: string) => (
               <tr key={est}>
 
                 <td className="px-4 py-2 border border-[#444] text-[#d4af37] font-bold">
@@ -97,8 +102,8 @@ export default function EstadisticasPage() {
                 {tabla[est].map((v: number, i: number) => {
 
                   const valoresColumna = estrategias
-                    .filter(e => e !== "MIX")
-                    .map(e => tabla[e][i]);
+                    .filter((e: string) => e !== "MIX")
+                    .map((e: string) => tabla[e][i]);
 
                   const max = Math.max(...valoresColumna);
                   const isBest = est !== "MIX" && v === max && max > 0;

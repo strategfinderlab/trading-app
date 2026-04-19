@@ -7,7 +7,13 @@ const Plot = dynamic(() => import("react-plotly.js"), {
   ssr: false
 });
 
-export default function Top3PorDiaChart({ dias, topNombres, topValores }: any) {
+type Props = {
+  dias: string[];
+  topNombres: Record<string, string[]>;
+  topValores: Record<string, number[]>;
+};
+
+export default function Top3PorDiaChart({ dias, topNombres, topValores }: Props) {
 
   const traces = [0, 1, 2].map(i => {
 
@@ -18,15 +24,15 @@ export default function Top3PorDiaChart({ dias, topNombres, topValores }: any) {
     return {
       x: dias,
       y,
-      type: "bar",
+      type: "bar" as const,
       name: `Top ${i + 1}`,
       marker: {
-        color: palette[i] // 🔥 AQUÍ ESTÁ LA CLAVE
+        color: palette[i]
       },
       text,
       textangle: -90,
-      textposition: "inside",
-      insidetextanchor: "start"
+      textposition: "inside" as const,
+      insidetextanchor: "start" as const
     };
   });
 

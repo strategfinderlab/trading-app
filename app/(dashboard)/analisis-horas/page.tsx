@@ -1,8 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import HorasChart from "../../../components/charts/HorasChart";
+import dynamicImport from "next/dynamic";
 import { getStrategies, calcularMejores, normalizarDia } from "../../../lib/calculos";
+
+export const dynamic = "force-dynamic";
+
+const HorasChart = dynamicImport(
+  () => import("../../../components/charts/HorasChart"),
+  { ssr: false }
+);
 
 export default function AnalisisHorasPage() {
 

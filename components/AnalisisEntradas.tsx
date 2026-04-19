@@ -147,11 +147,13 @@ export default function AnalisisEntradas() {
     return Object.values(grouped);
   };
 
-  const estrategiasMix = Array.from(
-    new Set(Object.values(mejores).filter(Boolean))
+  const estrategiasMix: string[] = Array.from(
+    new Set(
+      (Object.values(mejores) as string[]).filter(Boolean)
+    )
   );
 
-  const estrategiasMostrar = ["MIX", ...estrategiasMix];
+  const estrategiasMostrar: string[] = ["MIX", ...estrategiasMix];
 
   const dias = ["Lunes","Martes","Miércoles","Jueves","Viernes"];
 
@@ -161,7 +163,7 @@ export default function AnalisisEntradas() {
       {/* ---------------- SL ---------------- */}
       <h2 className="text-center text-xl mb-4">📊 Análisis por SL</h2>
 
-      {estrategiasMostrar.map((e) => {
+      {estrategiasMostrar.map((e: string) => {
 
         const chartData = getSLData(e);
         if (chartData.length === 0) return null;

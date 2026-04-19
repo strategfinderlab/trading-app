@@ -3,12 +3,17 @@
 import Plot from "react-plotly.js";
 import { getPlotlyLayout } from "@/lib/plotlyStyle";
 
-export default function SLChart({ data, estrategias }: any) {
+type Props = {
+  data: any[];
+  estrategias: string[];
+};
+
+export default function SLChart({ data, estrategias }: Props) {
 
   // ✅ AQUÍ VAN LAS VARIABLES (FUERA DEL RETURN)
   const estrategiasLimpias = [...new Set(
     estrategias.filter(e => e && e !== "id")
-  )].sort();
+  )];
 
   return (
     <div className="flex flex-col gap-12">

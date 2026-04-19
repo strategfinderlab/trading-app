@@ -9,8 +9,13 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.1.0",
+    "ag-grid-community": "^35.2.1",
+    "ag-grid-react": "^35.2.1",
     "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.3",
     "next": "16.2.3",
+    "pg": "^8.20.0",
     "plotly.js": "^3.5.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
@@ -20,9 +25,12 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/bcrypt": "^6.0.0",
+    "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/react-plotly.js": "^2.6.4",
     "eslint": "^9",
     "eslint-config-next": "16.2.3",
     "tailwindcss": "^4",

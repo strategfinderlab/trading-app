@@ -53,7 +53,11 @@ export default function MontecarloChart({
         plot_bgcolor: "#000",
         font: { color: "#d4af37" },
         height: 500,
-        title: "Montecarlo MIX",
+        title: {
+          text: "Montecarlo MIX",
+          x: 0.5,
+          xanchor: "center" as const,
+        },
         yaxis: {
           ticksuffix: "%",
         }

@@ -589,7 +589,8 @@ export default function EntradasGrid() {
           theme="legacy"
           rowData={rowData}
           columnDefs={columnDefs}
-          enterMovesDown={true}
+          enterNavigatesVertically={true}
+          enterNavigatesVerticallyAfterEdit={true}
           singleClickEdit={true}
           getRowId={(params) => String(params.data.id)}
           stopEditingWhenCellsLoseFocus={true}
