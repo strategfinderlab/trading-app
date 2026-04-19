@@ -10,16 +10,13 @@ export async function POST(req: Request) {
   try {
     console.log("🔥 RESTORE START");
 
-    const body = await req.json();
-    console.log("BODY:", body);
-
-    const { url } = body;
+    const { url } = await req.json();
 
     if (!url) {
       throw new Error("No URL provided");
     }
 
-    console.log("FETCHING URL:", url);
+    console.log("FETCHING:", url);
 
     const res = await fetch(url, {
       headers: {
@@ -30,7 +27,7 @@ export async function POST(req: Request) {
     console.log("FETCH STATUS:", res.status);
 
     const text = await res.text();
-    console.log("RAW TEXT:", text.slice(0, 500)); // solo primeros 500 chars
+    console.log("RAW TEXT (first 300):", text.slice(0, 300));
 
     if (!text) {
       throw new Error("Empty response from blob");
@@ -42,7 +39,6 @@ export async function POST(req: Request) {
       backup = JSON.parse(text);
     } catch (e) {
       console.error("❌ JSON PARSE ERROR");
-      console.error(text);
       throw new Error("Invalid JSON");
     }
 
@@ -53,47 +49,49 @@ export async function POST(req: Request) {
       ? backup
       : backup.entradas;
 
-    if (!entradas || !Array.isArray(entradas)) {
-      throw new Error("Invalid backup structure (no entradas)");
+    if (!entradas) {
+      throw new Error("No entradas found in backup");
     }
 
-    console.log("ENTRADAS LENGTH:", entradas.length);
-    console.log("FIRST ROW:", entradas[0]);
+    console.log("ENTRADAS GROUPS:", entradas.length);
 
-    console.log("🗑️ DELETING TABLE...");
+    // 🔥 BORRAR TODO
     await pool.query("DELETE FROM entradas");
 
-    console.log("📥 INSERTING DATA...");
+    console.log("🗑️ TABLE CLEARED");
 
-    for (const row of entradas) {
+    // 🔥 INSERT CORRECTO (data anidada)
+    for (const group of entradas) {
 
-      const keys = Object.keys(row).filter(k => k !== "id");
-      const values = Object.values(row).map(v =>
-        v === null || v === undefined ? null : String(v)
-      );
+      if (!group.data || !Array.isArray(group.data)) continue;
 
-      console.log("INSERT ROW:", keys);
+      for (const row of group.data) {
 
-      const query = `
-        INSERT INTO entradas (${keys.join(",")})
-        VALUES (${keys.map((_, i) => `$${i + 1}`).join(",")})
-      `;
+        const keys = Object.keys(row).filter(k => k !== "id");
 
-      await pool.query(query, values);
+        const values = keys.map(k => {
+          const v = row[k];
+          return v === null || v === undefined ? null : String(v);
+        });
+
+        const query = `
+          INSERT INTO entradas (${keys.join(",")})
+          VALUES (${keys.map((_, i) => `$${i + 1}`).join(",")})
+        `;
+
+        await pool.query(query, values);
+      }
     }
 
-    console.log("✅ RESTORE DONE");
+    console.log("✅ RESTORE COMPLETED");
 
     return NextResponse.json({ success: true });
 
   } catch (err: any) {
-    console.error("❌ RESTORE ERROR FULL:", err);
+    console.error("❌ RESTORE ERROR:", err);
 
     return NextResponse.json(
-      {
-        error: err.message,
-        stack: err.stack,
-      },
+      { error: err.message },
       { status: 500 }
     );
   }
