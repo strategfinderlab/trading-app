@@ -17,7 +17,15 @@ export async function POST(req: Request) {
     const { url } = await req.json();
 
     const res = await fetch(url);
-    const backup = await res.json();
+
+    console.log("FETCH STATUS:", res.status);
+
+    const text = await res.text();
+    console.log("RAW RESPONSE:", text);
+
+    const backup = JSON.parse(text);
+
+    console.log("PARSED BACKUP:", backup);
 
     const entradas = backup.entradas;
 
