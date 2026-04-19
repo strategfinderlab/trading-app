@@ -34,7 +34,7 @@ export async function GET(req: Request) {
     const filename = `backup-${date}.json`;
 
     const blob = await put(filename, JSON.stringify(data), {
-      access: "public", // 👈 CAMBIAR
+      access: "private", // 👈 CAMBIAR
     });
 
     return NextResponse.json({
