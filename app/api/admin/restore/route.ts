@@ -29,12 +29,10 @@ export async function POST(req: Request) {
     if (Array.isArray(backup)) {
       for (const item of backup) {
         if (item.data && Array.isArray(item.data)) {
-          rows.push(...item.data);
-        } else {
-          rows.push(item);
+          rows.push(...item.data); // ✅ SOLO datos reales
         }
       }
-    } else if (backup.entradas) {
+    } else if (backup.entradas && Array.isArray(backup.entradas)) {
       rows = backup.entradas;
     }
 
@@ -44,7 +42,7 @@ export async function POST(req: Request) {
       throw new Error("No data to restore");
     }
 
-    // 🔥 INSERT MASIVO CON USERNAME
+    // 🔥 INSERT MASIVO
     const values = rows.map((_, i) => `($1, $${i + 2})`).join(",");
 
     await pool.query(
