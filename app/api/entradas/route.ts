@@ -20,8 +20,7 @@ export async function GET() {
 
   const result = await pool.query(
     `SELECT data FROM entradas 
-     WHERE LOWER(username)=LOWER($1)
-     ORDER BY id DESC`,
+     WHERE LOWER(username)=LOWER($1)`,
     [user]
   );
 
@@ -29,7 +28,7 @@ export async function GET() {
     return NextResponse.json([]);
   }
 
-  const cleaned = [];
+  const rows = [];
 
   for (const row of result.rows) {
     let d = row.data;
@@ -42,18 +41,15 @@ export async function GET() {
       }
     }
 
-    // 🔥 caso 1: objeto normal
-    if (!Array.isArray(d)) {
-      cleaned.push(d);
-    }
-
-    // 🔥 caso 2: array dentro
-    else {
-      cleaned.push(...d);
+    // 🔥 IMPORTANTE: convertir a objeto plano
+    if (Array.isArray(d)) {
+      rows.push(...d);
+    } else if (typeof d === "object" && d !== null) {
+      rows.push(d);
     }
   }
 
-  return NextResponse.json(cleaned);
+  return NextResponse.json(rows);
 }
 
 
