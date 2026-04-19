@@ -13,7 +13,7 @@ export async function GET(req: Request) {
 
   if (!isCron) {
     const auth = req.headers.get("authorization");
-
+  
     if (auth !== `Bearer ${process.env.BACKUP_SECRET}`) {
       return NextResponse.json({ error: "unauthorized" }, { status: 401 });
     }
