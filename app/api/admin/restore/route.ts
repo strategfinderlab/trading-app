@@ -10,7 +10,11 @@ export async function POST(req: Request) {
   try {
     console.log("🔥 RESTORE START");
 
-    const { url } = await req.json();
+    const { url, username } = await req.json();
+
+    if (!url || !username) {
+      throw new Error("Missing url or username");
+    }
 
     const res = await fetch(url, {
       headers: {
@@ -40,15 +44,12 @@ export async function POST(req: Request) {
       throw new Error("No data to restore");
     }
 
-    // ⚠️ NO BORRAR (todavía)
-    // await pool.query("DELETE FROM entradas");
-
-    // 🔥 INSERT MASIVO
-    const values = rows.map((row, i) => `($${i + 1})`).join(",");
+    // 🔥 INSERT MASIVO CON USERNAME
+    const values = rows.map((_, i) => `($1, $${i + 2})`).join(",");
 
     await pool.query(
-      `INSERT INTO entradas (data) VALUES ${values}`,
-      rows
+      `INSERT INTO entradas (username, data) VALUES ${values}`,
+      [username, ...rows]
     );
 
     console.log("✅ RESTORE DONE");
