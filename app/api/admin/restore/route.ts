@@ -27,7 +27,7 @@ export async function POST(req: Request) {
 
     console.log("PARSED BACKUP:", backup);
 
-    const entradas = backup.entradas;
+    const entradas = Array.isArray(backup) ? backup : backup.entradas;
 
     // ⚠️ BORRAR TODO
     await pool.query("DELETE FROM entradas");
