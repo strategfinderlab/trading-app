@@ -50,22 +50,33 @@ export async function GET() {
       rows.push(d);
     }
   }
-  // 🔥 ORDENAR POR FECHA (de más antigua a más nueva)
-  rows.sort((a, b) => {
-    const parseDate = (str: string) => {
-      if (!str) return 0;
+    // 🔥 ORDENAR POR FECHA (de más antigua a más nueva)
+    rows.sort((a, b) => {
+      const parseDate = (str: string) => {
+        if (!str) return 0;
 
-      // formato: "29/04/2025 15:00"
-      const [date, time] = str.split(" ");
-      const [day, month, year] = date.split("/");
+        const [date, time] = str.split(" ");
+        const [day, month, year] = date.split("/");
 
-      return new Date(`${year}-${month}-${day}T${time || "00:00"}`).getTime();
-    };
+        return new Date(`${year}-${month}-${day}T${time || "00:00"}`).getTime();
+      };
 
-    return parseDate(a["Fecha"]) - parseDate(b["Fecha"]);
-  });
+      return parseDate(a["Fecha"]) - parseDate(b["Fecha"]);
+    });
 
-  return NextResponse.json(rows);
+    // 🔥 ELIMINAR DUPLICADOS (AQUÍ 👇)
+    const unique = new Map();
+
+    for (const row of rows) {
+      const key = `${row.Par}-${row.Fecha}-${row["Direc"]}`;
+      if (!unique.has(key)) {
+        unique.set(key, row);
+      }
+    }
+
+    const finalRows = Array.from(unique.values());
+
+    return NextResponse.json(finalRows);
 }
 
 
