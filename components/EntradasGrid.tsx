@@ -5,9 +5,20 @@ import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 
 // 🔥 AG GRID
-import { ModuleRegistry, AllCommunityModule } from "ag-grid-community";
+import {
+  ModuleRegistry,
+  ClientSideRowModelModule,
+  ColumnsToolPanelModule,
+  MenuModule,
+  FiltersModule
+} from "ag-grid-community";
 
-ModuleRegistry.registerModules([AllCommunityModule]);
+ModuleRegistry.registerModules([
+  ClientSideRowModelModule,
+  ColumnsToolPanelModule,
+  MenuModule,        // 👈 CLAVE
+  FiltersModule      // 👈 CLAVE
+]);
 
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
@@ -613,7 +624,7 @@ export default function EntradasGrid() {
             editable: true,
             resizable: true,
             sortable: true,
-            filter: true, 
+            filter: "agSetColumnFilter", 
             suppressMovable: true,
             cellStyle: {
               textAlign: "center",
