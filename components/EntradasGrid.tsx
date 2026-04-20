@@ -5,8 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 
 // 🔥 AG GRID
-import { ModuleRegistry } from "ag-grid-community";
-import { AllCommunityModule } from "ag-grid-community/dist/ag-grid-community.cjs.js";
+import { ModuleRegistry, AllCommunityModule } from "ag-grid-community";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -604,10 +603,8 @@ export default function EntradasGrid() {
           enterNavigatesVertically={true}
           enterNavigatesVerticallyAfterEdit={true}
           singleClickEdit={false}
-          suppressClickEdit={true}
           getRowId={(params) => String(params.data.id)}
           stopEditingWhenCellsLoseFocus={true}
-          suppressSetFilterByDefault={false}
           suppressMenuHide={false}
           animateRows={true}
           ref={gridRef}
