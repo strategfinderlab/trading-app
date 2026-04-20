@@ -10,10 +10,10 @@ export async function POST(req: Request) {
   try {
     console.log("🔥 RESTORE START");
 
-    const { url, username } = await req.json();
+    const { url } = await req.json();
 
-    if (!url || !username) {
-      throw new Error("Missing url or username");
+    if (!url) {
+      throw new Error("Missing url");
     }
 
     const res = await fetch(url, {
@@ -24,31 +24,18 @@ export async function POST(req: Request) {
 
     const backup = JSON.parse(await res.text());
 
-    let rows: any[] = [];
-
-    if (Array.isArray(backup)) {
-      for (const item of backup) {
-        if (item.data && Array.isArray(item.data)) {
-          rows.push(...item.data); // ✅ SOLO datos reales
-        }
-      }
-    } else if (backup.entradas && Array.isArray(backup.entradas)) {
-      rows = backup.entradas;
+    if (!backup.entradas || !Array.isArray(backup.entradas)) {
+      throw new Error("Invalid backup format");
     }
 
-    console.log("TOTAL ROWS:", rows.length);
-
-    if (rows.length === 0) {
-      throw new Error("No data to restore");
+    for (const row of backup.entradas) {
+      await pool.query(`
+        INSERT INTO entradas (username, data)
+        VALUES ($1, $2)
+        ON CONFLICT (username)
+        DO UPDATE SET data = EXCLUDED.data
+      `, [row.username, JSON.stringify(row.data)]);
     }
-
-    // 🔥 INSERT MASIVO
-    const values = rows.map((_, i) => `($1, $${i + 2})`).join(",");
-
-    await pool.query(
-      `INSERT INTO entradas (username, data) VALUES ${values}`,
-      [username, ...rows]
-    );
 
     console.log("✅ RESTORE DONE");
 
