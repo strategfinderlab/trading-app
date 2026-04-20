@@ -613,9 +613,7 @@ export default function EntradasGrid() {
             editable: true,
             resizable: true,
             sortable: true,
-            filter: "agSetColumnFilter",
-            floatingFilter: true,
-            menuTabs: ["filterMenuTab"],
+            filter: "agSetColumnFilter", // 👈 dropdown tipo Excel
             suppressMovable: true,
             cellStyle: {
               textAlign: "center",
