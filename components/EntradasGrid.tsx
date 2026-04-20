@@ -5,7 +5,9 @@ import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 
 // 🔥 AG GRID
-import { ModuleRegistry, AllCommunityModule } from "ag-grid-community";
+import { ModuleRegistry } from "ag-grid-community";
+import { AllCommunityModule } from "ag-grid-community/dist/ag-grid-community.cjs.js";
+
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 import "ag-grid-community/styles/ag-grid.css";
@@ -613,7 +615,7 @@ export default function EntradasGrid() {
             editable: true,
             resizable: true,
             sortable: true,
-            filter: "agSetColumnFilter", // 👈 dropdown tipo Excel
+            filter: true, 
             suppressMovable: true,
             cellStyle: {
               textAlign: "center",
