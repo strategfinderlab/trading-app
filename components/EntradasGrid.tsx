@@ -299,10 +299,20 @@ export default function EntradasGrid() {
               cellRenderer: isLink
                 ? (params: any) => {
                     if (!params.value) return null;
+
+                    const handleClick = (e: any) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      window.open(params.value, "_blank");
+                    };
+
                     return (
-                      <a href={params.value} target="_blank" style={{ color: "#d4af37" }}>
+                      <span
+                        onClick={handleClick}
+                        style={{ color: "#d4af37", cursor: "pointer" }}
+                      >
                         VER
-                      </a>
+                      </span>
                     );
                   }
                 : undefined
@@ -600,7 +610,7 @@ export default function EntradasGrid() {
             editable: true,
             resizable: true,
             sortable: true,
-            filter: true,
+            filter: "agSetColumnFilter",
             suppressMovable: true,
             cellStyle: {
               textAlign: "center",
