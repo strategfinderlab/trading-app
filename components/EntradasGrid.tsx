@@ -597,7 +597,7 @@ export default function EntradasGrid() {
       {/* GRID */}
       <div className="ag-theme-alpine" style={{ height: 500, width: "100%" }}>
         <AgGridReact
-          theme="legacy"
+          //theme="legacy"
           rowData={rowData}
           columnDefs={columnDefs}
           enterNavigatesVertically={true}
