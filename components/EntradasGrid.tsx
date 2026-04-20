@@ -163,7 +163,7 @@ export default function EntradasGrid() {
     editable: true,
     resizable: true,
     sortable: true,
-    filter: true,
+    filter: "agNumberColumnFilter",
     width: 140
   });
   const handleDeleteStrategy = () => {
@@ -608,6 +608,7 @@ export default function EntradasGrid() {
           suppressMenuHide={false}
           animateRows={true}
           ref={gridRef}
+          enableFilterHandlers={true}
           defaultColDef={{
             editable: true,
             resizable: true,
