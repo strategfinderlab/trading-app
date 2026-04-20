@@ -606,14 +606,16 @@ export default function EntradasGrid() {
           getRowId={(params) => String(params.data.id)}
           stopEditingWhenCellsLoseFocus={true}
           suppressSetFilterByDefault={false}
+          suppressMenuHide={false}
           animateRows={true}
           ref={gridRef}
           defaultColDef={{
             editable: true,
             resizable: true,
             sortable: true,
-            floatingFilter: true, // 👈 CLAVE
             filter: "agSetColumnFilter",
+            floatingFilter: true,
+            menuTabs: ["filterMenuTab"],
             suppressMovable: true,
             cellStyle: {
               textAlign: "center",
