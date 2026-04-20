@@ -288,7 +288,7 @@ export default function EntradasGrid() {
               editable: !isReadOnly,
               resizable: true,
               sortable: true,
-              filter: true,
+              filter: "agSetColumnFilter",
               width: 140,
               pinned: fixedColumns.includes(key) ? "left" : undefined,
 
@@ -601,9 +601,11 @@ export default function EntradasGrid() {
           columnDefs={columnDefs}
           enterNavigatesVertically={true}
           enterNavigatesVerticallyAfterEdit={true}
-          singleClickEdit={true}
+          singleClickEdit={false}
+          suppressClickEdit={true}
           getRowId={(params) => String(params.data.id)}
           stopEditingWhenCellsLoseFocus={true}
+          suppressSetFilterByDefault={false}
           animateRows={true}
           ref={gridRef}
           defaultColDef={{
