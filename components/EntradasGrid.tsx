@@ -612,6 +612,7 @@ export default function EntradasGrid() {
             editable: true,
             resizable: true,
             sortable: true,
+            floatingFilter: true, // 👈 CLAVE
             filter: "agSetColumnFilter",
             suppressMovable: true,
             cellStyle: {
