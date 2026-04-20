@@ -5,20 +5,9 @@ import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 
 // 🔥 AG GRID
-import {
-  ModuleRegistry,
-  ClientSideRowModelModule,
-  ColumnsToolPanelModule,
-  MenuModule,
-  FiltersModule
-} from "ag-grid-community";
+import { ModuleRegistry, AllCommunityModule } from "ag-grid-community";
 
-ModuleRegistry.registerModules([
-  ClientSideRowModelModule,
-  ColumnsToolPanelModule,
-  MenuModule,        // 👈 CLAVE
-  FiltersModule      // 👈 CLAVE
-]);
+ModuleRegistry.registerModules([AllCommunityModule]);
 
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
@@ -611,6 +600,7 @@ export default function EntradasGrid() {
           //theme="legacy"
           rowData={rowData}
           columnDefs={columnDefs}
+          popupParent={typeof window !== "undefined" ? document.body : undefined}
           enterNavigatesVertically={true}
           enterNavigatesVerticallyAfterEdit={true}
           singleClickEdit={false}

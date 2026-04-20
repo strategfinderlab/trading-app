@@ -113,6 +113,7 @@ body {
 }
 
 .ag-theme-alpine {
+  overflow: visible !important;
   background-color: #000 !important;
 }
 
