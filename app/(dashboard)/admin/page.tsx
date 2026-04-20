@@ -8,6 +8,7 @@ export default function AdminPage() {
   const [users, setUsers] = useState<any[]>([]);
   const [filter, setFilter] = useState("");
   const [currentUser, setCurrentUser] = useState("");
+  const [backups, setBackups] = useState<any[]>([]);
 
   // 🔄 cargar usuarios
   const loadUsers = async () => {
@@ -22,10 +23,21 @@ export default function AdminPage() {
     const data = await res.json();
     setCurrentUser(data.user);
   };
+  const loadBackups = async () => {
+    const res = await fetch("/api/backups", {
+      headers: {
+        Authorization: `Bearer ${process.env.NEXT_PUBLIC_BACKUP_SECRET}`
+      }
+    });
+
+    const data = await res.json();
+    setBackups(data.backups || []);
+  };
 
   useEffect(() => {
     loadUsers();
     loadMe();
+    loadBackups(); // 👈 añadir
   }, []);
 
   // ➕ crear usuario
@@ -94,6 +106,27 @@ export default function AdminPage() {
     u.username.toLowerCase().includes(filter.toLowerCase())
   );
 
+  const handleRestore = async (url: string) => {
+
+    if (!confirm("⚠️ Esto sobrescribirá TODOS los datos. ¿Seguro?")) return;
+
+    const res = await fetch("/api/restore", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ url }),
+    });
+
+    const data = await res.json();
+
+    if (data.error) {
+      alert("Error: " + data.error);
+    } else {
+      alert("✅ Backup restaurado");
+    }
+  };
+
   return (
     <div className="text-white p-10">
 
@@ -161,6 +194,32 @@ export default function AdminPage() {
               </button>
 
             </div>
+          </div>
+        ))}
+
+      </div>
+
+      <h2 className="text-2xl mt-10 mb-4 text-[#d4af37]">
+        Backups
+      </h2>
+
+      <div className="flex flex-col gap-2">
+
+        {backups.map((b, i) => (
+          <div
+            key={i}
+            className="flex justify-between items-center border border-[#333] p-3 rounded bg-[#111]"
+          >
+            <div className="text-gray-300 text-sm">
+              {new Date(b.uploadedAt).toLocaleString()}
+            </div>
+
+            <button
+              onClick={() => handleRestore(b.url)}
+              className="px-3 py-1 border border-yellow-500 text-yellow-400 rounded hover:bg-yellow-500 hover:text-black transition"
+            >
+              Restaurar
+            </button>
           </div>
         ))}
 

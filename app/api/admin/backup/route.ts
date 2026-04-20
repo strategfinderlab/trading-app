@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { Pool } from "pg";
-import { put } from "@vercel/blob";
+import { put, list, del } from "@vercel/blob";
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -8,34 +8,33 @@ const pool = new Pool({
 
 export async function GET(req: Request) {
 
-  // 🔐 permitir cron de Vercel o acceso manual con secret
-  const isCron = req.headers.get("user-agent")?.includes("vercel");
-
-  if (!isCron) {
-    //const auth = req.headers.get("authorization");
-
-    //if (auth !== `Bearer ${process.env.BACKUP_SECRET}`) {
-      //return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-    //}
-  }
-
   try {
-    // 👉 puedes añadir más tablas aquí
     const entradas = await pool.query("SELECT * FROM entradas");
-    // const usuarios = await pool.query("SELECT * FROM users");
 
     const data = {
       entradas: entradas.rows,
-      // usuarios: usuarios.rows
     };
 
-    // 🔥 evitar ":" en nombre (problemas en algunos sistemas)
-    const date = new Date().toISOString().replace(/[:.]/g, "-");
-    const filename = `backup-${date}.json`;
+    const date = new Date();
+    const filename = `backup-${date.toISOString().replace(/[:.]/g, "-")}.json`;
 
     const blob = await put(filename, JSON.stringify(data), {
-      access: "private", // 👈 CAMBIAR
+      access: "private",
     });
+
+    // 🔥 LIMPIEZA (más de 14 días)
+    const blobs = await list();
+
+    const now = Date.now();
+    const maxAge = 14 * 24 * 60 * 60 * 1000;
+
+    for (const b of blobs.blobs) {
+      const created = new Date(b.uploadedAt).getTime();
+
+      if (now - created > maxAge) {
+        await del(b.url);
+      }
+    }
 
     return NextResponse.json({
       success: true,
