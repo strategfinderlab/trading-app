@@ -17,10 +17,10 @@ export default function TestGrid() {
     { Fecha: "03/01/2024", Par: "EURUSD", Resultado: "TP" },
   ]);
 
-  const columnDefs = [
-    { field: "Fecha" },
-    { field: "Par" },
-    { field: "Resultado" },
+  const columnDefs: any[] = [
+    { field: "Fecha", filter: "agSetColumnFilter" },
+    { field: "Par", filter: "agSetColumnFilter" },
+    { field: "Resultado", filter: "agSetColumnFilter" },
   ];
 
   return (
@@ -28,10 +28,6 @@ export default function TestGrid() {
       <AgGridReact
         rowData={rowData}
         columnDefs={columnDefs}
-        defaultColDef={{
-          filter: "agSetColumnFilter",
-          floatingFilter: true,
-        }}
       />
     </div>
   );
