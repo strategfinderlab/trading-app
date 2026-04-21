@@ -17,7 +17,7 @@ export default function TestGrid() {
     { Fecha: "03/01/2024", Par: "EURUSD", Resultado: "TP" },
   ]);
 
-  const columnDefs = [
+  const columnDefs: any[] = [
     { field: "Fecha" },
     { field: "Par" },
     { field: "Resultado" },
@@ -25,7 +25,7 @@ export default function TestGrid() {
 
   return (
     <div className="ag-theme-alpine" style={{ height: 400 }}>
-      <AgGridReact
+      <AgGridReact<any>
         rowData={rowData}
         columnDefs={columnDefs}
         defaultColDef={{
