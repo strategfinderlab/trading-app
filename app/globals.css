@@ -15,3 +15,7 @@ body {
 .ag-root-wrapper {
   overflow: visible !important;
 }
+
+.ag-theme-alpine {
+  --ag-popup-z-index: 9999;
+}

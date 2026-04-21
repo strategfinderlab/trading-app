@@ -292,22 +292,9 @@ export default function EntradasGrid() {
 
               filter: "agSetColumnFilter",
               filterParams: {
-                values: (params: any) => {
-                  const values = new Set<string>();
-
-                  params.api.forEachNode((node: any) => {
-                    if (node.data && node.data[key] !== undefined && node.data[key] !== null) {
-                      values.add(String(node.data[key]));
-                    }
-                  });
-
-                  params.success(Array.from(values));
-                },
-
-                // 🔥 mejoras UX
                 buttons: ["apply", "reset"],
                 debounceMs: 200,
-                suppressMiniFilter: false, // buscador dentro del dropdown
+                suppressMiniFilter: false,
               },
 
               width: 140,
@@ -601,7 +588,7 @@ export default function EntradasGrid() {
             editable: true,
             resizable: true,
             sortable: true,
-            filter: true,
+            filter: "agSetColumnFilter",
             suppressMovable: true,
           }}
         />
