@@ -24,3 +24,11 @@ body {
   position: fixed !important;
   z-index: 9999 !important;
 }
+
+html, body, #__next {
+  height: 100%;
+}
+
+.ag-theme-alpine {
+  height: 100%;
+}
