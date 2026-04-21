@@ -617,7 +617,7 @@ export default function EntradasGrid() {
             filter: "agSetColumnFilter", 
             suppressMovable: true,
             menuTabs: ['filterMenuTab'],
-            suppressHeaderMenuButton={false},
+            suppressHeaderMenuButton: false,
             cellStyle: {
               textAlign: "center",
               alignItems: "center",
