@@ -616,6 +616,8 @@ export default function EntradasGrid() {
             sortable: true,
             filter: "agSetColumnFilter", 
             suppressMovable: true,
+            suppressMenu: false,
+            menuTabs: ['filterMenuTab'],
             cellStyle: {
               textAlign: "center",
               alignItems: "center",
@@ -629,7 +631,7 @@ export default function EntradasGrid() {
               allCols.push(col.getColId());
             });
 
-            params.api.autoSizeColumns(allCols);
+            params.api.autoSizeColumns(["Fecha", "Fecha cierre"]);
           }}
           onCellValueChanged={(params) => {
 
