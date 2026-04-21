@@ -13,5 +13,5 @@ body {
 
 /* 🔥 MUY IMPORTANTE → NO ROMPER POPUPS */
 .ag-root-wrapper {
-  overflow: hidden !important;
+  overflow: visible !important;
 }

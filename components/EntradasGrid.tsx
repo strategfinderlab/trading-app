@@ -296,8 +296,8 @@ export default function EntradasGrid() {
                   const values = new Set<string>();
 
                   params.api.forEachNode((node: any) => {
-                    if (node.data && node.data[key]) {
-                      values.add(node.data[key]);
+                    if (node.data && node.data[key] !== undefined && node.data[key] !== null) {
+                      values.add(String(node.data[key]));
                     }
                   });
 
@@ -594,8 +594,9 @@ export default function EntradasGrid() {
         <AgGridReact
           rowData={rowData}
           columnDefs={columnDefs}
-          suppressMenuHide={true} // 🔥 muestra icono siempre
           popupParent={typeof window !== "undefined" ? document.body : undefined}
+          suppressMenuHide={false}
+          domLayout="normal"
           defaultColDef={{
             editable: true,
             resizable: true,
