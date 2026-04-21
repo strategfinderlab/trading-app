@@ -290,6 +290,7 @@ export default function EntradasGrid() {
               resizable: true,
               sortable: true,
               filter: "agTextColumnFilter",
+              floatingFilter: true, // 🔥 CLAVE
               width: 140,
               pinned: fixedColumns.includes(key) ? "left" : undefined,
 
@@ -603,11 +604,10 @@ export default function EntradasGrid() {
           defaultColDef={{
             editable: true,
             resizable: true,
-            floatingFilter: true,
             sortable: true,
             filter: true,
+            floatingFilter: true, // ✅ SOLO UNA VEZ
             suppressMovable: true,
-            floatingFilter: true,
           }}
         />
       </div>
