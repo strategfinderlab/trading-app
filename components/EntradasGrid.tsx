@@ -616,23 +616,21 @@ export default function EntradasGrid() {
             sortable: true,
             filter: "agSetColumnFilter", 
             suppressMovable: true,
-            suppressMenu: false,
             menuTabs: ['filterMenuTab'],
+            suppressHeaderMenuButton={false}
             cellStyle: {
               textAlign: "center",
               alignItems: "center",
               justifyContent: "center"
             }
           }}
+
           onFirstDataRendered={(params) => {
-            const allCols: string[] = [];
-
-            params.api.getColumns()?.forEach(col => {
-              allCols.push(col.getColId());
-            });
-
-            params.api.autoSizeColumns(["Fecha", "Fecha cierre"]);
+            setTimeout(() => {
+              params.api.autoSizeColumns(["Fecha", "Fecha cierre"]);
+            }, 50);
           }}
+
           onCellValueChanged={(params) => {
 
             const row = params.data;
