@@ -28,7 +28,7 @@ export default function TestGrid() {
       <AgGridReact
         rowData={rowData}
         columnDefs={columnDefs}
-        popupParent={document.body}
+        popupParent={typeof window !== "undefined" ? document.body : undefined}
       />
     </div>
   );
