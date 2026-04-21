@@ -599,14 +599,15 @@ export default function EntradasGrid() {
         <AgGridReact
           rowData={rowData}
           columnDefs={columnDefs}
-          floatingFilter={true}
           popupParent={typeof window !== "undefined" ? document.body : undefined}
           defaultColDef={{
             editable: true,
             resizable: true,
+            floatingFilter: true,
             sortable: true,
             filter: true,
             suppressMovable: true,
+            floatingFilter: true,
           }}
         />
       </div>
