@@ -1,38 +1,26 @@
-"use client";
+@import "tailwindcss";
 
-import { AgGridReact } from "ag-grid-react";
-import { ModuleRegistry, AllCommunityModule } from "ag-grid-community";
-import { useState } from "react";
+body {
+  background: #000;
+  color: #d4af37;
+}
 
-import "ag-grid-community/styles/ag-grid.css";
-import "ag-grid-community/styles/ag-theme-alpine.css";
+/* SOLO LO NECESARIO */
+.ag-theme-alpine {
+  --ag-background-color: #000;
+  --ag-foreground-color: #d4af37;
+}
 
-ModuleRegistry.registerModules([AllCommunityModule]);
+/* 🔥 MUY IMPORTANTE → NO ROMPER POPUPS */
+.ag-root-wrapper {
+  overflow: visible !important;
+}
 
-export default function TestGrid() {
+.ag-theme-alpine {
+  --ag-popup-z-index: 9999;
+}
 
-  const [rowData] = useState([
-    { Fecha: "01/01/2024", Par: "EURUSD", Resultado: "TP" },
-    { Fecha: "02/01/2024", Par: "GBPUSD", Resultado: "SL" },
-    { Fecha: "03/01/2024", Par: "EURUSD", Resultado: "TP" },
-  ]);
-
-  const columnDefs = [
-    { field: "Fecha" },
-    { field: "Par" },
-    { field: "Resultado" },
-  ];
-
-  return (
-    <div className="ag-theme-alpine" style={{ height: 400 }}>
-      <AgGridReact
-        rowData={rowData}
-        columnDefs={columnDefs}
-        defaultColDef={{
-          filter: "agSetColumnFilter",
-          floatingFilter: true,
-        }}
-      />
-    </div>
-  );
+.ag-theme-alpine .ag-popup {
+  position: fixed !important;
+  z-index: 9999 !important;
 }
