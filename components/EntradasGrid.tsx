@@ -30,8 +30,8 @@ export default function TestGrid() {
         columnDefs={columnDefs}
         defaultColDef={{
           filter: "agSetColumnFilter",
+          floatingFilter: true, // 🔥 ESTO ES LA CLAVE
         }}
-        suppressMenuHide={true}
       />
     </div>
   );
