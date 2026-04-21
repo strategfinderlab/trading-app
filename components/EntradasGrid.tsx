@@ -17,10 +17,10 @@ export default function TestGrid() {
     { Fecha: "03/01/2024", Par: "EURUSD", Resultado: "TP" },
   ]);
 
-  const columnDefs: any[] = [
-    { field: "Fecha", filter: "agSetColumnFilter" },
-    { field: "Par", filter: "agSetColumnFilter" },
-    { field: "Resultado", filter: "agSetColumnFilter" },
+  const columnDefs = [
+    { field: "Fecha" },
+    { field: "Par" },
+    { field: "Resultado" },
   ];
 
   return (
@@ -28,7 +28,10 @@ export default function TestGrid() {
       <AgGridReact
         rowData={rowData}
         columnDefs={columnDefs}
-        popupParent={typeof window !== "undefined" ? document.body : undefined}
+        defaultColDef={{
+          filter: "agSetColumnFilter",
+        }}
+        suppressMenuHide={true}
       />
     </div>
   );
