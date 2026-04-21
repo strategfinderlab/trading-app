@@ -289,7 +289,7 @@ export default function EntradasGrid() {
               editable: !isReadOnly,
               resizable: true,
               sortable: true,
-              filter: "agSetColumnFilter",
+              filter: "agTextColumnFilter",
               width: 140,
               pinned: fixedColumns.includes(key) ? "left" : undefined,
 
@@ -597,70 +597,16 @@ export default function EntradasGrid() {
       {/* GRID */}
       <div className="ag-theme-alpine" style={{ height: 500, width: "100%" }}>
         <AgGridReact
-          //theme="legacy"
           rowData={rowData}
           columnDefs={columnDefs}
+          floatingFilter={true}
           popupParent={typeof window !== "undefined" ? document.body : undefined}
-          enterNavigatesVertically={true}
-          enterNavigatesVerticallyAfterEdit={true}
-          singleClickEdit={false}
-          getRowId={(params) => String(params.data.id)}
-          stopEditingWhenCellsLoseFocus={true}
-          suppressMenuHide={false}
-          animateRows={true}
-          ref={gridRef}
-          enableFilterHandlers={true}
           defaultColDef={{
             editable: true,
             resizable: true,
             sortable: true,
-            filter: "agSetColumnFilter", 
+            filter: true,
             suppressMovable: true,
-            menuTabs: ['filterMenuTab'],
-            suppressHeaderMenuButton: false,
-            cellStyle: {
-              textAlign: "center",
-              alignItems: "center",
-              justifyContent: "center"
-            }
-          }}
-
-          onFirstDataRendered={(params) => {
-            setTimeout(() => {
-              params.api.autoSizeColumns(["Fecha", "Fecha cierre"]);
-            }, 50);
-          }}
-
-          onCellValueChanged={(params) => {
-
-            const row = params.data;
-
-            if (params.colDef.field === "Fecha") {
-              row["Día semana"] = getDiaSemana(row["Fecha"]);
-            }
-
-            if (
-              params.colDef.field === "Fecha" ||
-              params.colDef.field === "Fecha cierre"
-            ) {
-              row["Duración"] = getDuracion(
-                row["Fecha"],
-                row["Fecha cierre"]
-              );
-            }
-
-            const rows: any[] = [];
-
-            gridRef.current.api.forEachNode((node: any) => {
-              rows.push({ ...node.data });
-            });
-
-            setData(rows);
-
-            params.api.refreshCells({
-              rowNodes: [params.node],
-              force: true
-            });
           }}
         />
       </div>
