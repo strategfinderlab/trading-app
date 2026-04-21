@@ -289,35 +289,24 @@ export default function EntradasGrid() {
               editable: !isReadOnly,
               resizable: true,
               sortable: true,
-              filter: "agTextColumnFilter",
-              floatingFilter: true, // 🔥 CLAVE
+
+              filter: "agSetColumnFilter", // 🔥 DESPLEGABLE
+              filterParams: {
+                values: (params: any) => {
+                  const values = new Set<string>();
+
+                  params.api.forEachNode((node: any) => {
+                    if (node.data && node.data[key]) {
+                      values.add(node.data[key]);
+                    }
+                  });
+
+                  params.success(Array.from(values));
+                }
+              },
+
               width: 140,
               pinned: fixedColumns.includes(key) ? "left" : undefined,
-
-              cellStyle: isReadOnly
-                ? { backgroundColor: "#111", color: "#888" }
-                : undefined,
-
-              cellRenderer: isLink
-                ? (params: any) => {
-                    if (!params.value) return null;
-
-                    const handleClick = (e: any) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      window.open(params.value, "_blank");
-                    };
-
-                    return (
-                      <span
-                        onClick={handleClick}
-                        style={{ color: "#d4af37", cursor: "pointer" }}
-                      >
-                        VER
-                      </span>
-                    );
-                  }
-                : undefined
             };
           })
         ];
@@ -600,15 +589,16 @@ export default function EntradasGrid() {
         <AgGridReact
           rowData={rowData}
           columnDefs={columnDefs}
+          suppressMenuHide={true} // 🔥 muestra icono siempre
           popupParent={typeof window !== "undefined" ? document.body : undefined}
           defaultColDef={{
             editable: true,
             resizable: true,
             sortable: true,
             filter: true,
-            floatingFilter: true, // ✅ SOLO UNA VEZ
             suppressMovable: true,
           }}
+        />
         />
       </div>
     </div>
