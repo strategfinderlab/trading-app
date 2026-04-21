@@ -579,17 +579,13 @@ export default function EntradasGrid() {
       {/* GRID */}
       <div className="ag-theme-alpine" style={{ height: 500, width: "100%" }}>
         <AgGridReact
+          ref={gridRef}
           rowData={rowData}
           columnDefs={columnDefs}
-          popupParent={typeof window !== "undefined" ? document.body : undefined}
-          suppressMenuHide={false}
-          domLayout="normal"
           defaultColDef={{
             editable: true,
             resizable: true,
-            sortable: true,
-            filter: "agSetColumnFilter",
-            suppressMovable: true,
+            filter: "agSetColumnFilter", // 🔥 CLAVE
           }}
         />
       </div>
