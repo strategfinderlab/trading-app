@@ -17,9 +17,21 @@ export const calcularTop3Mensual = (data: any[]) => {
   };
 
   // 🔥 detectar estrategias
+  const base = [
+    "Fecha","Día semana","Par","Direc",
+    "Link antes","Tamaño SL","Comentarios","Link después",
+    "Fecha cierre","Duración","SL/TP",
+    "Filtro 1","Filtro 2","Contabilizar","MIX","id"
+  ];
+
   const columnas = Object.keys(filtrado[0]);
-  const idxMix = columnas.indexOf("MIX");
-  const estrategias = columnas.slice(idxMix);
+
+  const estrategias = columnas
+    .filter(c => !base.includes(c)) // quitar base
+    .filter(c => {
+      const val = filtrado[0][c];
+      return !isNaN(parseFloat(val)); // solo numéricas
+    });
 
   const grouped: any = {};
 
@@ -37,13 +49,13 @@ export const calcularTop3Mensual = (data: any[]) => {
         conteo: {}
       };
 
-      estrategias.forEach(e => {
+      [ "MIX", ...estrategias ].forEach(e => {
         grouped[mes].valores[e] = 0;
         grouped[mes].conteo[e] = 0;
       });
     }
 
-    estrategias.forEach(e => {
+    [ "MIX", ...estrategias ].forEach(e => {
 
       let raw = String(row[e] ?? "");
 

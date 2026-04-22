@@ -17,9 +17,13 @@ export async function POST(req: Request) {
 
   const { username } = await req.json();
 
+  const usernameClean = username.trim().toLowerCase();
+
   await pool.query(
-    `UPDATE users SET password=NULL WHERE username=$1`,
-    [username]
+    `INSERT INTO users (username, role, password)
+    VALUES ($1, 'user', NULL)
+    ON CONFLICT (username) DO NOTHING`,
+    [usernameClean]
   );
 
   return NextResponse.json({ ok: true });

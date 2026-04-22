@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { calcularTop3Mensual } from "@/lib/calculosMensual";
 import { normalizarDia } from "@/lib/calculos";
-
+import React from "react";
 export default function AnalisisMensualPage() {
 
   const [tabla, setTabla] = useState<any[]>([]);
@@ -94,7 +94,7 @@ export default function AnalisisMensualPage() {
                   </td>
 
                   {row.top.map((t: any, idx: number) => (
-                    <>
+                    <React.Fragment key={t.nombre + idx}>
                       <td className="p-2 border-l-4 border-[#888]">
                         {t.nombre}
                       </td>
@@ -104,7 +104,7 @@ export default function AnalisisMensualPage() {
                       <td className="p-2">
                         {t.trades}
                       </td>
-                    </>
+                    </React.Fragment>
                   ))}
 
                 </tr>

@@ -7,6 +7,8 @@ import { calcularTop3PorDia } from "@/lib/calculosEstadisticas";
 import { calcularDireccion } from "@/lib/calculosEstadisticas";
 import { calcularMetricas } from "@/lib/calculosEstadisticas";
 import { calcularFiltros } from "@/lib/calculosEstadisticas";
+import { calcularTopPorPar } from "@/lib/calculosEstadisticas";
+import TopPorParChart from "@/components/charts/TopPorParChart";
 
 export default function EstadisticasPage() {
 
@@ -52,6 +54,7 @@ export default function EstadisticasPage() {
   const filtros = calcularFiltros(data);
 
   const { topNombres, topValores } = calcularTop3PorDia(tabla, dias);
+  const topPar = calcularTopPorPar(data);
 
   return (
     <div className="text-white">
@@ -185,6 +188,19 @@ export default function EstadisticasPage() {
 
         </table>
       </div>
+
+      
+      <h2 className="text-2xl font-bold mb-6 border-b border-[#d4af37] pb-2">
+        📊 Top estrategias por par
+      </h2>
+      {topPar && (
+        <div className="mt-10">
+          <TopPorParChart
+            pares={topPar.pares}
+            dataChart={topPar.dataChart}
+          />
+        </div>
+      )}
 
       <h2 className="text-2xl font-bold mb-6 border-b border-[#d4af37] pb-2">
         📊 Según filtros aplicados

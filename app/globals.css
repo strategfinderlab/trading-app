@@ -1,2 +1,179 @@
 @import "tailwindcss";
 
+body {
+  background: #000;
+  color: #d4af37;
+}
+
+/* SOLO LO NECESARIO */
+.ag-theme-alpine {
+  --ag-background-color: #000;
+  --ag-foreground-color: #d4af37;
+}
+
+/* 🔥 MUY IMPORTANTE → NO ROMPER POPUPS */
+.ag-root-wrapper {
+  overflow: visible !important;
+}
+
+.ag-theme-alpine {
+  --ag-popup-z-index: 9999;
+}
+
+.ag-theme-alpine .ag-popup {
+  position: fixed !important;
+  z-index: 9999 !important;
+}
+
+html, body, #__next {
+  height: 100%;
+}
+
+.ag-theme-alpine {
+  height: 100%;
+}
+
+.center-header .ag-header-cell-label {
+  justify-content: center;
+}
+
+.ag-pinned-left-header {
+  border-right: 2px solid #d4af37;
+}
+
+.ag-pinned-left-cols-container {
+  border-right: 2px solid #d4af37;
+}
+
+/* 🔥 GRID DARK CUSTOM */
+
+.ag-theme-alpine {
+  --ag-background-color: #0d0d0d;
+  --ag-foreground-color: #ffffff;
+  --ag-header-background-color: #111;
+  --ag-header-foreground-color: #ffffff;
+}
+
+/* 🔥 FILAS ALTERNAS */
+.ag-row:nth-child(even) {
+  background-color: #111;
+}
+
+.ag-row:nth-child(odd) {
+  background-color: #0d0d0d;
+}
+
+/* 🔥 BORDES EN TODAS LAS CELDAS */
+.ag-cell {
+  border-right: 1px solid #333 !important;
+  border-bottom: 1px solid #333 !important;
+}
+
+/* borde izquierdo */
+.ag-row .ag-cell:first-child {
+  border-left: 1px solid #333 !important;
+}
+
+/* borde superior */
+.ag-header-cell {
+  border: 1px solid #333 !important;
+}
+
+/* 🔥 COLUMNAS NO EDITABLES */
+.not-editable {
+  background-color: #050505 !important;
+  color: #ffffff !important;
+  opacity: 0.6; /* 🔥 mejor que gris */
+}
+
+/* 🔥 LINKS */
+.link-cell a {
+  color: #d4af37;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.ag-header {
+  background-color: #111 !important;
+  color: #fff !important;
+}
+
+.ag-header-cell-label {
+  color: #fff !important;
+}
+
+.ag-row:hover {
+  background-color: #1a1a1a !important;
+}
+
+/* 🔥 TEXTO SIEMPRE BLANCO */
+.ag-theme-alpine,
+.ag-theme-alpine .ag-cell,
+.ag-theme-alpine .ag-header-cell,
+.ag-theme-alpine .ag-header-cell-label,
+.ag-theme-alpine .ag-cell-value {
+  color: #ffffff !important;
+}
+
+/* 🔥 FIX CHECKBOX VISUAL */
+.ag-theme-alpine input[type="checkbox"] {
+  accent-color: #d4af37; /* dorado visible */
+}
+
+/* 🔥 INPUT DE EDICIÓN (cuando escribes en la celda) */
+.ag-theme-alpine .ag-cell-edit-input,
+.ag-theme-alpine input.ag-input-field-input {
+  background-color: #000 !important;
+  color: #fff !important;
+  border: 1px solid #444 !important;
+}
+
+/* 🔥 SELECT (por si usas dropdowns en edición) */
+.ag-theme-alpine select {
+  background-color: #000 !important;
+  color: #fff !important;
+}
+
+/* 🔥 CELDA EN EDICIÓN */
+.ag-cell-inline-editing {
+  background-color: #111 !important;
+  color: #fff !important;
+}
+
+/* 🔥 INPUT REAL DE AG GRID (el que faltaba) */
+.ag-theme-alpine .ag-cell-inline-editing input,
+.ag-theme-alpine .ag-cell-inline-editing textarea {
+  color: #ffffff !important;
+  background-color: #000000 !important;
+  caret-color: #ffffff !important; /* 🔥 cursor visible */
+}
+
+/* 🔥 FORZAR INPUT INTERNO */
+.ag-theme-alpine input[type="text"] {
+  color: #ffffff !important;
+  background-color: #000000 !important;
+}
+
+/* 🔥 BOTONES TOOLBAR BONITOS */
+.toolbar-btn {
+  background: #111;
+  color: #d4af37;
+  border: 1px solid #d4af37;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+/* hover */
+.toolbar-btn:hover {
+  background: #d4af37;
+  color: #000;
+  box-shadow: 0 0 6px #d4af37;
+}
+
+/* click */
+.toolbar-btn:active {
+  transform: scale(0.95);
+}

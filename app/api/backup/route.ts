@@ -11,16 +11,25 @@ export async function GET(req: Request) {
   try {
     const entradas = await pool.query("SELECT * FROM entradas");
 
+    const row = entradas.rows[0];
+
     const data = {
-      entradas: entradas.rows,
+      username: row.username,
+      estrategias: row.estrategias,
+      entradas: row.data, // 🔥 AQUÍ ESTÁ LA CLAVE
     };
 
     const date = new Date();
     const filename = `backup-${date.toISOString().replace(/[:.]/g, "-")}.json`;
+    const jsonString = JSON.stringify(data);
 
-    const blob = await put(filename, JSON.stringify(data), {
-      access: "private",
-    });
+    const blob = await put(
+      filename,
+      new Blob([jsonString], { type: "application/json" }),
+      {
+        access: "private",
+      }
+    );
 
     // 🔥 LIMPIEZA (más de 14 días)
     const blobs = await list();

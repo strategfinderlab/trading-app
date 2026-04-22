@@ -9,9 +9,11 @@ const pool = new Pool({
 export async function POST(req: Request) {
   const { username, password } = await req.json();
 
+  const usernameClean = username.trim().toLowerCase();
+
   const result = await pool.query(
     `SELECT * FROM users WHERE username=$1`,
-    [username]
+    [usernameClean]
   );
 
   if (result.rows.length === 0) {

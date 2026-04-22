@@ -11,7 +11,7 @@ export default function FirstLogin() {
 
     await fetch("/api/auth/set-password", {
       method: "POST",
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify({ username: email, password })
     });
 
     alert("Password creado. Ya puedes hacer login");

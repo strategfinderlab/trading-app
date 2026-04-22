@@ -20,7 +20,12 @@ export const calcularEstadisticas = (data: any[]) => {
     "Filtro 1","Filtro 2","Contabilizar","MIX","id"
   ];
 
-  const estrategias = columnas.filter(c => !base.includes(c));
+  const estrategias = columnas
+    .filter(c => !base.includes(c))
+    .filter(c => {
+      const val = clean[0][c];
+      return !isNaN(parseFloat(val));
+    });
 
   const estrategiasAll = ["MIX", ...estrategias];
 
@@ -391,4 +396,96 @@ export const calcularFiltros = (data: any[]) => {
   console.log("FILTROS FINAL:", result);
 
   return result;
+};
+
+export const calcularTopPorPar = (data: any[]) => {
+
+  const filtrado = data.filter(
+    r => String(r["Contabilizar"]).toUpperCase() === "SI"
+  );
+
+  if (filtrado.length === 0) return null;
+
+  // 🔥 columnas base
+  const base = [
+    "Fecha","Día semana","Par","Direc",
+    "Link antes","Tamaño SL","Comentarios","Link después",
+    "Fecha cierre","Duración","SL/TP",
+    "Filtro 1","Filtro 2","Contabilizar","MIX","id"
+  ];
+
+  const columnas = Object.keys(filtrado[0]);
+
+  // 🔥 estrategias reales
+  const estrategias = columnas.filter(c => !base.includes(c));
+
+  // 🔥 suma global (para TOP)
+  const sumaGlobal: any = {};
+
+  ["MIX", ...estrategias].forEach(e => sumaGlobal[e] = 0);
+
+  // 🔥 agrupado por par
+  const grouped: any = {};
+
+  filtrado.forEach(row => {
+
+    const par = row["Par"];
+    if (!par) return;
+
+    if (!grouped[par]) {
+      grouped[par] = {};
+      ["MIX", ...estrategias].forEach(e => grouped[par][e] = 0);
+    }
+
+    ["MIX", ...estrategias].forEach(e => {
+
+      let raw = String(row[e] ?? "");
+
+      raw = raw
+        .replace("R", "")
+        .replace("BE", "0")
+        .replace(",", ".");
+
+      let val = Number(raw);
+
+      // 👇 tu lógica especial Excel
+      if (e === "bex2") val = val / 1.5;
+
+      if (!isNaN(val)) {
+        grouped[par][e] += val;
+        sumaGlobal[e] += val;
+      }
+    });
+
+  });
+
+  // 🔥 TOP 2 estrategias globales (sin MIX)
+  const top = Object.entries(sumaGlobal)
+    .filter(([k]) => k !== "MIX")
+    .sort((a: any, b: any) => b[1] - a[1])
+    .slice(0, 2)
+    .map(([k]) => k);
+
+  // 🔥 estructura final para gráfico
+  const pares = Object.keys(grouped);
+
+  const dataChart = [
+    {
+      name: "MIX",
+      y: pares.map(p => grouped[p]["MIX"] || 0)
+    },
+    {
+      name: top[0],
+      y: pares.map(p => grouped[p][top[0]] || 0)
+    },
+    {
+      name: top[1],
+      y: pares.map(p => grouped[p][top[1]] || 0)
+    }
+  ];
+
+  return {
+    pares,
+    dataChart
+  };
 };
