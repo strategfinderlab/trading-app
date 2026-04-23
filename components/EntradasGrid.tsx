@@ -434,7 +434,7 @@ export default function TestGrid() {
             const result = await res.json();
             console.log(result);
 
-            alert("Guardado en Neon ✅");
+            alert("Guardado ✅");
           }}
         >
           💾 Guardar
