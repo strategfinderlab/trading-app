@@ -70,7 +70,8 @@ export default function TestGrid() {
       strategies.forEach(s => {
         const suma = filas.reduce((acc, row) => {
           const val = parseFloat(row[s]);
-          return acc + (isNaN(val) ? 0 : val);
+          return acc + (isNaN(val) ? 0 : val);        
+
         }, 0);
 
         if (suma > mejorVal) {
@@ -112,12 +113,20 @@ export default function TestGrid() {
     return newData.map(row => {
 
       const mejor = mejores[row["Día semana"]];
-      const val = mejor ? parseFloat(row[mejor]) : NaN;
 
-      let mix = isNaN(val) ? "" : val;
+      const raw = mejor ? row[mejor] : null;
+
+      const num = Number(raw);
+
+      const val =
+        raw === null || raw === undefined || raw === "" || isNaN(num)
+          ? null
+          : num;
+
+      const mix = val ?? "";
 
       let sltp = "";
-      if (!isNaN(val)) {
+      if (val !== null) {
         sltp = val >= 0 ? "TP" : "SL";
       }
 
@@ -148,10 +157,12 @@ export default function TestGrid() {
         newValues = [...current, value];
       }
 
-      return {
+      const updated = {
         ...prev,
         [field]: newValues,
       };
+
+      return updated;
     });
   };
 
@@ -164,7 +175,7 @@ export default function TestGrid() {
   });
 
   // 🔥 HEADER
-  const DropdownHeader = (field: string, options: string[]) => {
+  const DropdownHeader = (field: string, options: string[], filters: any) => {
     return function Header() {
 
       const [open, setOpen] = useState(false);
@@ -225,31 +236,25 @@ export default function TestGrid() {
               </div>
 
               {options.map(opt => (
-                <label key={opt} style={{ display: "block" }}>
-                  <label
-                    key={opt}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 8,
-                      padding: "4px 6px",
-                      cursor: "pointer",
-                      borderRadius: 4
-                    }}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={selected.includes(opt)}
-                      onChange={() => toggle(field, opt)}
-                      style={{
-                        accentColor: "#d4af37",
-                        cursor: "pointer"
-                      }}
-                    />
-                    {opt}
-                  </label>
-                </label>
-              ))}
+                <div
+                  key={opt}
+                  onClick={() => toggle(field, opt)}
+                  style={{
+                    padding: "6px 8px",
+                    marginBottom: 4,
+                    cursor: "pointer",
+                    borderRadius: 4,
+                    background: selected.includes(opt) ? "#d4af37" : "#1a1a1a",
+                    color: selected.includes(opt) ? "#000" : "#fff",
+                    fontWeight: selected.includes(opt) ? "bold" : "normal",
+                    border: "1px solid #444",
+                    transition: "all 0.15s ease"
+                  }}
+                >
+                  {opt}
+                </div>
+                ))}
+
 
             </div>
           )}
@@ -342,11 +347,23 @@ export default function TestGrid() {
               isLink ? 90 :
               isDateColumn ? 180 :
               width,
+
             editable: !readOnlyCols.includes(key),
-            headerComponent: DropdownHeader(key, values),
+
+            headerComponent: DropdownHeader(key, values, filters),
+
             pinned: pinnedCols.includes(key) ? "left" : undefined,
             suppressMovable: true,
             cellRenderer: isLink ? linkRenderer : undefined,
+
+            // 🔥 AÑADE ESTO SOLO PARA MIX
+            valueGetter: key === "MIX"
+              ? (params: any) => params.data["MIX"] || ""
+              : undefined,
+
+            valueFormatter: key === "MIX"
+              ? (params: any) => params.value === "" ? "" : params.value
+              : undefined,
           };
         });
 
@@ -354,6 +371,17 @@ export default function TestGrid() {
         setRowData(recalcularCampos(data, cols));
       });
   }, []);
+  useEffect(() => {
+    setColumnDefs(prev =>
+      prev.map(col => ({
+        ...col,
+        headerComponent: DropdownHeader(col.field, 
+          [...new Set(rowData.map(r => r[col.field]).filter(v => v))],
+          filters
+        )
+      }))
+    );
+  }, [filters]);
   return (
     <div>
 
