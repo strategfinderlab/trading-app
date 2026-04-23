@@ -177,23 +177,25 @@ export default function AdminPage() {
               <span className="text-gray-500">({u.role})</span>
             </div>
 
-            <div className="flex gap-2">
+            {u.username !== currentUser && (
+              <div className="flex gap-2">
 
-              <button
-                onClick={() => handleReset(u.username)}
-                className="px-3 py-1 border border-blue-500 text-blue-400 rounded hover:bg-blue-500 hover:text-black transition"
-              >
-                Reset
-              </button>
+                <button
+                  onClick={() => handleReset(u.username)}
+                  className="px-3 py-1 border border-blue-500 text-blue-400 rounded hover:bg-blue-500 hover:text-black transition"
+                >
+                  Reset
+                </button>
 
-              <button
-                onClick={() => handleDelete(u.username)}
-                className="px-3 py-1 border border-red-500 text-red-400 rounded hover:bg-red-500 hover:text-black transition"
-              >
-                Borrar
-              </button>
+                <button
+                  onClick={() => handleDelete(u.username)}
+                  className="px-3 py-1 border border-red-500 text-red-400 rounded hover:bg-red-500 hover:text-black transition"
+                >
+                  Borrar
+                </button>
 
-            </div>
+              </div>
+            )}
           </div>
         ))}
 

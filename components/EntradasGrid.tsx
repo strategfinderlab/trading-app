@@ -364,6 +364,24 @@ export default function TestGrid() {
             valueFormatter: key === "MIX"
               ? (params: any) => params.value === "" ? "" : params.value
               : undefined,
+            cellStyle: (params: any) => {
+              const baseStyle = {
+                textAlign: "center",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              };
+
+              if (readOnlyCols.includes(params.colDef.field)) {
+                return {
+                  ...baseStyle,
+                  background: "#0a0a0a", // 🔥 más oscuro
+                  color: "#888"
+                };
+              }
+
+              return baseStyle;
+            },
           };
         });
 
@@ -591,6 +609,12 @@ export default function TestGrid() {
             }
           }}
           suppressMovableColumns={true}
+          getRowStyle={(params) => {
+            if (params.node.rowIndex % 2 === 0) {
+              return { background: "#111" }; // fila par
+            }
+            return { background: "#161616" }; // fila impar (un poco más clara)
+          }}
         />
       </div>
 
