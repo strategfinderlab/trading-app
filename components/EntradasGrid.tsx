@@ -609,15 +609,7 @@ export default function TestGrid() {
             }
           }}
           suppressMovableColumns={true}
-          getRowStyle={(params) => {
-            const index = params.node.rowIndex ?? 0;
 
-            if (index % 2 === 0) {
-              return { background: "#111" }; // fila par
-            }
-
-            return { background: "#161616" }; // fila impar
-          }}
         />
       </div>
 

@@ -7,13 +7,26 @@ export default function HorasChart({ data, estrategias }: any) {
 
   const dias = ["Martes", "Miércoles", "Jueves"];
 
+  const parseFecha = (str: string) => {
+    if (!str) return null;
+
+    const [fechaPart, horaPart] = str.split(" ");
+    if (!fechaPart || !horaPart) return null;
+
+    const [d, m, y] = fechaPart.split("/").map(Number);
+    const [hh, mm] = horaPart.split(":").map(Number);
+
+    return new Date(y, m - 1, d, hh, mm);
+  };
+
   const procesar = (rows: any[], estrategia: string) => {
 
     const grouped: any = {};
 
     rows.forEach((r: any) => {
 
-      const fecha = new Date(r["Fecha"]);
+      const fecha = parseFecha(r["Fecha"]);
+      if (!fecha) return;
       if (isNaN(fecha.getTime())) return;
 
       const hora = fecha.getHours();
@@ -42,9 +55,7 @@ export default function HorasChart({ data, estrategias }: any) {
 
         if (!estrategia || estrategia === "id") return null;
 
-        const filtered = data.filter(
-          (r: any) => String(r["Contabilizar"]).toUpperCase() === "SI"
-        );
+        const filtered = data;
 
         const global = procesar(filtered, estrategia);
 
