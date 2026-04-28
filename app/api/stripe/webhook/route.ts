@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { Pool } from "pg";
+import { Resend } from "resend";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -46,8 +47,21 @@ export async function POST(req: Request) {
 
     console.log("✅ Usuario creado:", username);
 
-    // 🔥 ENVIAR EMAIL
-    const res = await fetch("https://strategyfinderlab.com/api/send-email", {
+    // 🔔 NOTIFICACIÓN PARA TI
+    const resend = new Resend(process.env.RESEND_API_KEY);
+
+    await resend.emails.send({
+      from: "soporte@strategyfinderlab.com",
+      to: "cristianblesa@hotmail.com",
+      subject: "💰 Nueva venta en Strategy Finder Lab",
+      html: `
+        <h2>Nueva compra 🚀</h2>
+        <p><b>Email cliente:</b> ${email}</p>
+      `,
+    });
+
+    // 🔥 ENVIAR EMAIL AL CLIENTE
+    const res = await fetch("https://www.strategyfinderlab.com/api/send-email", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
