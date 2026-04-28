@@ -5,8 +5,11 @@ export function proxy(req: NextRequest) {
 
   const { pathname } = req.nextUrl;
 
-  // 🔥 NO bloquear archivos internos
+  // 🔥 RUTAS PÚBLICAS
   if (
+    pathname.startsWith("/login") ||
+    pathname.startsWith("/unete") ||
+    pathname.startsWith("/success") ||
     pathname.startsWith("/_next") ||
     pathname.startsWith("/api") ||
     pathname.includes(".")
@@ -16,15 +19,17 @@ export function proxy(req: NextRequest) {
 
   const user = req.cookies.get("user");
 
-  if (!user && pathname !== "/login") {
+  // 🔒 SOLO PROTEGER PRIVADAS
+  if (!user || !user.value) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
+  // 🔐 ADMIN
   if (pathname.startsWith("/admin")) {
     const role = req.cookies.get("role")?.value;
 
     if (role !== "admin") {
-        return NextResponse.redirect(new URL("/entradas", req.url));
+      return NextResponse.redirect(new URL("/entradas", req.url));
     }
   }
 

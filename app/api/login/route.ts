@@ -38,7 +38,11 @@ export async function POST(req: Request) {
 
   const res = NextResponse.json({ ok: true });
 
-  res.cookies.set("user", username, { path: "/" });
+  res.cookies.set("user", username, {
+    path: "/",
+    httpOnly: true,
+    sameSite: "lax",
+  });
   res.cookies.set("role", user.role, { path: "/" });
 
   return res;
