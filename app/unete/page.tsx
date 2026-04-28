@@ -21,7 +21,7 @@ export default function UnetePage() {
               Para de cambiar de estrategia.
             </span>
             <span className="block text-[#d4af37]">
-              Empieza a entenderla."
+              Empieza a entenderla.
             </span>
           </h1>
 
