@@ -18,15 +18,15 @@ export default function UnetePage() {
         <section className="text-center py-12 max-w-4xl px-6">
           <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
             <span className="block text-white">
-              Para de cambiar de estrategia.
+              Para de cambiar de estrategia
             </span>
             <span className="block text-[#d4af37]">
-              Empieza a entenderla.
+              Empieza a entenderla
             </span>
           </h1>
 
           <p className="text-lg text-gray-300 mb-8">
-            Strategy Finder Lab analiza tus entradas y te dice exactamente cuándo tu estrategia funciona y cuándo no.
+            Encuentra tu modelo de entrada, tu gráfico, tu comodidad. Strategy Finder Lab te dice cuándo rentabilizarlo
           </p>
 
         </section>
