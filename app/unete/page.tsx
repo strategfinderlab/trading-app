@@ -92,8 +92,11 @@ export default function UnetePage() {
               PRUEBA REAL
             </h3>
 
-            <img
+            <Image
               src="/demo1.png"
+              alt="demo"
+              width={800}
+              height={400}
               className="rounded border border-[#333] mb-6 mx-auto"
             />
 
