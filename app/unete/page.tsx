@@ -93,7 +93,7 @@ export default function UnetePage() {
             </h3>
 
             <Image
-              src="/demo1.png"
+              src="/Demo1.png"
               alt="demo"
               width={800}
               height={400}
