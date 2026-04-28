@@ -8,6 +8,8 @@ export async function GET() {
     payment_method_types: ["card"],
     mode: "payment",
 
+    allow_promotion_codes: true, // 👈 AQUÍ
+
     line_items: [
       {
         price_data: {
