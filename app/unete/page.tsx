@@ -18,10 +18,10 @@ export default function UnetePage() {
         <section className="text-center py-12 max-w-4xl px-6">
           <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
             <span className="block text-white">
-              Tu estrategia no falla.
+              Para de cambiar de estrategia.
             </span>
             <span className="block text-[#d4af37]">
-              No sabes cuándo usarla.
+              Empieza a entenderla."
             </span>
           </h1>
 
