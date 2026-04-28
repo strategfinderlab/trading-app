@@ -3,51 +3,64 @@ import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-await resend.emails.send({
-  from: "soporte@strategyfinderlab.com",
-  to: email,
-  subject: "Bienvenido a Strategy Finder Lab",
-  html: `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; color: #111;">
-      
-      <h2 style="color:#d4af37;">Bienvenid@ a Strategy Finder Lab</h2>
+export async function POST(req: Request) {
+  const { email } = await req.json(); // 👈 AQUÍ defines email
 
-      <p>Tu acceso ya está activo.</p>
+  try {
+    const data = await resend.emails.send({
+      from: "soporte@strategyfinderlab.com",
+      to: email,
+      subject: "Bienvenido a Strategy Finder Lab",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; color: #111;">
+          
+          <h2 style="color:#d4af37;">Bienvenid@ a Strategy Finder Lab</h2>
 
-      <p>
-        Entra aquí y crea tu contraseña pulsando <b>“Primer acceso”</b>:
-      </p>
+          <p>Tu acceso ya está activo.</p>
 
-      <p style="margin: 20px 0;">
-        <a href="https://strategyfinderlab.com/login"
-           style="background:#d4af37; color:#000; padding:12px 20px; text-decoration:none; border-radius:6px; font-weight:bold;">
-          Acceder a Strategy Finder Lab
-        </a>
-      </p>
+          <p>
+            Entra aquí y crea tu contraseña pulsando <b>“Primer acceso”</b>:
+          </p>
 
-      <p>
-        Tu email de acceso es el mismo con el que has realizado el pago.
-      </p>
+          <p style="margin: 20px 0;">
+            <a href="https://strategyfinderlab.com/login"
+               style="background:#d4af37; color:#000; padding:12px 20px; text-decoration:none; border-radius:6px; font-weight:bold;">
+              Acceder a Strategy Finder Lab
+            </a>
+          </p>
 
-      <p>
-        Una vez dentro, ya puedes empezar a registrar tus entradas y analizar tu estrategia con datos reales.
-      </p>
+          <p>
+            Tu email de acceso es el mismo con el que has realizado el pago.
+          </p>
 
-      <hr style="margin:30px 0; border:none; border-top:1px solid #eee;" />
+          <p>
+            Una vez dentro, ya puedes empezar a registrar tus entradas y analizar tu estrategia con datos reales.
+          </p>
 
-      <p style="font-size:14px; color:#555;">
-        Una petición personal: cuando lleves unas semanas usando la herramienta,
-        me encantaría saber qué te parece. Tu feedback me ayuda muchísimo a mejorarla.
-      </p>
+          <hr style="margin:30px 0; border:none; border-top:1px solid #eee;" />
 
-      <p style="font-size:14px; color:#555;">
-        Si tienes cualquier duda, puedes responder directamente a este email.
-      </p>
+          <p style="font-size:14px; color:#555;">
+            Una petición personal: cuando lleves unas semanas usando la herramienta,
+            me encantaría saber qué te parece. Tu feedback me ayuda muchísimo a mejorarla.
+          </p>
 
-      <p style="margin-top:30px;">
-        — Strategy Finder Lab
-      </p>
+          <p style="font-size:14px; color:#555;">
+            Si tienes cualquier duda, puedes responder directamente a este email.
+          </p>
 
-    </div>
-  `,
-});
+          <p style="margin-top:30px;">
+            — Strategy Finder Lab
+          </p>
+
+        </div>
+      `,
+    });
+
+    console.log("✅ RESEND:", data);
+
+  } catch (err) {
+    console.log("❌ ERROR RESEND:", err);
+  }
+
+  return NextResponse.json({ ok: true });
+}
