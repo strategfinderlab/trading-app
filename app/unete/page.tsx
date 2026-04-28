@@ -97,7 +97,8 @@ export default function UnetePage() {
               alt="demo"
               width={800}
               height={400}
-              className="rounded border border-[#333] mb-6 mx-auto"
+              sizes="(max-width: 768px) 100vw, 600px"
+              className="w-full max-w-xl h-auto rounded border border-[#333] mb-6 mx-auto"
             />
 
             <p className="text-[#d4af37]">
