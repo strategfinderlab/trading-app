@@ -53,6 +53,24 @@ export default function EstadisticasPage() {
   );
   const filtros = calcularFiltros(data);
 
+  const filtrosOrdenados = [...filtros].sort((a, b) => {
+
+    // 🔹 ordenar por filtro1
+    const f1Compare = String(a.f1).localeCompare(String(b.f1), undefined, {
+      numeric: true,
+      sensitivity: "base"
+    });
+
+    if (f1Compare !== 0) return f1Compare;
+
+    // 🔹 si filtro1 es igual → ordenar por filtro2
+    return String(a.f2).localeCompare(String(b.f2), undefined, {
+      numeric: true,
+      sensitivity: "base"
+    });
+
+  });
+
   const { topNombres, topValores } = calcularTop3PorDia(tabla, dias);
   const topPar = calcularTopPorPar(data);
 
@@ -222,7 +240,7 @@ export default function EstadisticasPage() {
       </thead>
 
       <tbody>
-      {filtros.map((f:any,i:number)=>(
+      {filtrosOrdenados.map((f:any,i:number)=>(
       <tr key={i} className="bg-black">
       <td className="border border-[#444] px-3 py-2">{f.f1}</td>
       <td className="border border-[#444] px-3 py-2">{f.f2}</td>
