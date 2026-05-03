@@ -24,6 +24,14 @@ export default function EstadisticasPage() {
       });
 
   }, []);
+  type Filtro = {
+    f1: string;
+    f2: string;
+    suma: number;
+    filas: number;
+    tp: number;
+    sl: number;
+  };
 
   const procesar = (data: any[]) => {
     const res = calcularEstadisticas(data);
@@ -51,7 +59,7 @@ export default function EstadisticasPage() {
     data,
     estrategias.filter((e: string) => e !== "MIX")
   );
-  const filtros = calcularFiltros(data);
+  const filtros = calcularFiltros(data) as Filtro[];
 
   const filtrosOrdenados = [...filtros].sort((a, b) => {
 
