@@ -7,33 +7,29 @@ const pool = new Pool({
 });
 
 export async function GET(req: Request) {
-
   try {
-    const entradas = await pool.query("SELECT * FROM entradas");
 
-    const row = entradas.rows[0];
+    const result = await pool.query("SELECT * FROM entradas");
 
-    const data = {
+    const data = result.rows.map(row => ({
       username: row.username,
       estrategias: row.estrategias,
-      entradas: row.data, // 🔥 AQUÍ ESTÁ LA CLAVE
-    };
+      entradas: typeof row.data === "string"
+        ? JSON.parse(row.data)
+        : row.data
+    }));
 
     const date = new Date();
     const filename = `backup-${date.toISOString().replace(/[:.]/g, "-")}.json`;
-    const jsonString = JSON.stringify(data);
 
     const blob = await put(
       filename,
-      new Blob([jsonString], { type: "application/json" }),
-      {
-        access: "private",
-      }
+      new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }),
+      { access: "private" }
     );
 
-    // 🔥 LIMPIEZA (más de 14 días)
+    // 🔥 limpiar backups antiguos
     const blobs = await list();
-
     const now = Date.now();
     const maxAge = 14 * 24 * 60 * 60 * 1000;
 
