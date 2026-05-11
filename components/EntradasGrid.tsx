@@ -386,7 +386,19 @@ export default function TestGrid() {
         });
 
         setColumnDefs(cols);
-        setRowData(recalcularCampos(data, cols));
+
+        const datosOrdenados = recalcularCampos(data, cols).sort(
+          (a: any, b: any) => {
+            const fechaA = parseFecha(a["Fecha"]);
+            const fechaB = parseFecha(b["Fecha"]);
+
+            if (!fechaA || !fechaB) return 0;
+
+            return fechaA.getTime() - fechaB.getTime();
+          }
+        );
+
+        setRowData(datosOrdenados);
       });
   }, []);
   useEffect(() => {
