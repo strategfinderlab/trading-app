@@ -5,7 +5,7 @@ import { getPlotlyLayout } from "@/lib/plotlyStyle";
 
 export default function HorasChart({ data, estrategias }: any) {
 
-  const dias = ["Martes", "Miércoles", "Jueves"];
+  const dias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
 
   const parseFecha = (str: string) => {
     if (!str) return null;
