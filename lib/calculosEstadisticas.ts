@@ -60,15 +60,6 @@ const reconstruirMix = (data: any[]) => {
 
     let mix: number | null = null;
 
-    if (!isNaN(val)) {
-      mix = val;
-    }
-
-    return {
-      ...row,
-      MIX: mix
-    };
-
     if (mejor) {
 
       let raw = String(row[mejor] ?? "");
@@ -89,6 +80,7 @@ const reconstruirMix = (data: any[]) => {
       ...row,
       MIX: mix
     };
+
   });
 
 };
