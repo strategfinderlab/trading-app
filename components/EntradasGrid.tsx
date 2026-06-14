@@ -37,7 +37,7 @@ export default function TestGrid() {
   const [selectedStrategies, setSelectedStrategies] = useState<string[]>([]);
   const [rowData, setRowData] = useState<any[]>([]);
   const diasSemana = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
-
+  const [showDeleteAllModal, setShowDeleteAllModal] = useState(false);
   const getDiaSemana = (fecha: string) => {
     const d = parseFecha(fecha);
     if (!d) return "";
@@ -457,6 +457,13 @@ export default function TestGrid() {
 
         <button
           className="toolbar-btn"
+          onClick={() => setShowDeleteAllModal(true)}
+        >
+          🗑️ Borrar todas las entradas
+        </button>
+
+        <button
+          className="toolbar-btn"
           onClick={async () => {
             const res = await fetch("/api/entradas", {
               method: "POST",
@@ -601,6 +608,75 @@ export default function TestGrid() {
               </button>
             </div>
 
+          </div>
+        </div>
+      )}
+
+      {showDeleteAllModal && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            background: "rgba(0,0,0,0.8)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 9999
+          }}
+        >
+          <div
+            style={{
+              background: "#111",
+              padding: 20,
+              border: "1px solid #444",
+              borderRadius: 8,
+              color: "#fff",
+              minWidth: 350
+            }}
+          >
+            <h3>⚠️ Borrar todas las entradas</h3>
+
+            <p>
+              ¿Estás seguro de que quieres borrar todas las filas?
+              <br />
+              Esta acción no se puede deshacer.
+            </p>
+
+            <div
+              style={{
+                marginTop: 15,
+                display: "flex",
+                gap: 10
+              }}
+            >
+              <button
+                className="toolbar-btn"
+                onClick={() => {
+                  const emptyRow: any = { id: 1 };
+
+                  columnDefs.forEach(col => {
+                    if (col.field !== "id") {
+                      emptyRow[col.field] = "";
+                    }
+                  });
+
+                  setRowData([emptyRow]);
+                  setShowDeleteAllModal(false);
+                }}
+              >
+                Sí, borrar todo
+              </button>
+
+              <button
+                className="toolbar-btn"
+                onClick={() => setShowDeleteAllModal(false)}
+              >
+                Cancelar
+              </button>
+            </div>
           </div>
         </div>
       )}
