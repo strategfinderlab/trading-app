@@ -6,7 +6,6 @@ const pool = new Pool({
 });
 
 export async function POST(req: Request) {
-
   try {
     console.log("🔥 RESTORE START");
 
@@ -22,27 +21,57 @@ export async function POST(req: Request) {
       },
     });
 
+    if (!res.ok) {
+      throw new Error(`Download failed (${res.status})`);
+    }
+
     const backup = JSON.parse(await res.text());
 
-    if (!backup.entradas || !Array.isArray(backup.entradas)) {
+    if (!Array.isArray(backup)) {
       throw new Error("Invalid backup format");
     }
 
-    for (const row of backup.entradas) {
-      await pool.query(`
-        INSERT INTO entradas (username, data)
-        VALUES ($1, $2)
+    for (const row of backup) {
+      await pool.query(
+        `
+        INSERT INTO entradas (
+          username,
+          data,
+          estrategias
+        )
+        VALUES (
+          $1,
+          $2,
+          $3
+        )
         ON CONFLICT (username)
-        DO UPDATE SET data = EXCLUDED.data
-      `, [row.username, JSON.stringify(row.data)]);
+        DO UPDATE SET
+          data = EXCLUDED.data,
+          estrategias = EXCLUDED.estrategias
+        `,
+        [
+          row.username,
+          JSON.stringify(row.entradas ?? []),
+          row.estrategias ?? null,
+        ]
+      );
     }
 
-    console.log("✅ RESTORE DONE");
+    console.log(`✅ RESTORE DONE (${backup.length} usuarios)`);
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({
+      success: true,
+      restored: backup.length,
+    });
 
   } catch (err: any) {
     console.error("❌ RESTORE ERROR:", err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+
+    return NextResponse.json(
+      {
+        error: err.message,
+      },
+      { status: 500 }
+    );
   }
 }
