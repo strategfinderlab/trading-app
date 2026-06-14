@@ -70,8 +70,7 @@ export default function TestGrid() {
       strategies.forEach(s => {
         const suma = filas.reduce((acc, row) => {
           const val = parseFloat(row[s]);
-          return acc + (isNaN(val) ? 0 : val);        
-
+          return acc + (isNaN(val) ? 0 : val);
         }, 0);
 
         if (suma > mejorVal) {
@@ -80,7 +79,8 @@ export default function TestGrid() {
         }
       });
 
-      res[dia] = mejor;
+      // 👇 si todas son negativas o 0, MIX no opera
+      res[dia] = mejorVal > 0 ? mejor : null;
     });
 
     return res;

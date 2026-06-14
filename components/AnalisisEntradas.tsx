@@ -47,7 +47,8 @@ const calcularMejores = (data: any[], strategies: string[]) => {
       }
     });
 
-    res[dia] = mejor;
+    // Si todas son negativas, MIX no opera ese día
+    res[dia] = mejorVal > 0 ? mejor : null;
   });
 
   return res;

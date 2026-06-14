@@ -1,3 +1,89 @@
+const reconstruirMix = (data: any[]) => {
+
+  const clean = [...data];
+
+  const base = [
+    "Fecha","Día semana","Par","Direc",
+    "Link antes","Tamaño SL","Comentarios","Link después",
+    "Fecha cierre","Duración","SL/TP",
+    "Filtro 1","Filtro 2","Contabilizar","MIX","id"
+  ];
+
+  const estrategias = Object.keys(clean[0] || {})
+    .filter(c => !base.includes(c));
+
+  const dias = ["Lunes","Martes","Miércoles","Jueves","Viernes"];
+
+  const mejores: any = {};
+
+  dias.forEach(dia => {
+
+    const filas = clean.filter(r =>
+      r["Día semana"] === dia &&
+      String(r["Contabilizar"]).toUpperCase() === "SI"
+    );
+
+    let mejor = null;
+    let mejorVal = -Infinity;
+
+    estrategias.forEach(est => {
+
+      const suma = filas.reduce((acc, row) => {
+
+        let raw = String(row[est] ?? "");
+
+        raw = raw
+          .replace("R", "")
+          .replace("BE", "0")
+          .replace(",", ".");
+
+        const val = Number(raw);
+
+        return acc + (isNaN(val) ? 0 : val);
+
+      }, 0);
+
+      if (suma > mejorVal) {
+        mejorVal = suma;
+        mejor = est;
+      }
+
+    });
+
+    mejores[dia] = mejorVal > 0 ? mejor : null;
+
+  });
+
+  return clean.map(row => {
+
+    const mejor = mejores[row["Día semana"]];
+
+    let mix = "";
+
+    if (mejor) {
+
+      let raw = String(row[mejor] ?? "");
+
+      raw = raw
+        .replace("R", "")
+        .replace("BE", "0")
+        .replace(",", ".");
+
+      const val = Number(raw);
+
+      if (!isNaN(val)) {
+        mix = val;
+      }
+    }
+
+    return {
+      ...row,
+      MIX: mix
+    };
+  });
+
+};
+
 export const calcularEstadisticas = (data: any[]) => {
 
   const dias = ["Lunes","Martes","Miércoles","Jueves","Viernes"];
@@ -67,7 +153,7 @@ export const calcularEstadisticas = (data: any[]) => {
     tabla[est].push(Number(total.toFixed(2)));
   });
 
-  // 🔥 mejores por día
+  // 🔥 mejores por día (SIN MIX)
   const mejores: any = {};
 
   dias.forEach((dia, i) => {
@@ -75,17 +161,43 @@ export const calcularEstadisticas = (data: any[]) => {
     let max = -Infinity;
     let best = null;
 
-    estrategiasAll.forEach(est => {
+    estrategias.forEach(est => {
+
       const val = tabla[est][i];
 
       if (val > max) {
         max = val;
         best = est;
       }
+
     });
 
+    // Si todas las estrategias son negativas o 0, no se opera
     mejores[dia] = max > 0 ? best : null;
+
   });
+
+  // 🔥 reconstruir MIX para que use la mejor estrategia de cada día
+  tabla["MIX"] = [];
+
+  dias.forEach((dia, i) => {
+
+    const mejor = mejores[dia];
+
+    if (!mejor) {
+      tabla["MIX"].push(0);
+    } else {
+      tabla["MIX"].push(tabla[mejor][i]);
+    }
+
+  });
+
+  const totalMix = tabla["MIX"].reduce(
+    (a: number, b: number) => a + b,
+    0
+  );
+
+  tabla["MIX"].push(Number(totalMix.toFixed(2)));
 
   // 🔥 Nº FILAS y % ACIERTO
   const filaConteo: number[] = [];
@@ -167,15 +279,21 @@ export const calcularTop3PorDia = (tabla: any, dias: string[]) => {
 };
 
 export const calcularMetricas = (data: any[], estrategias: string[]) => {
+  data = reconstruirMix(data);
 
   const resultados: any[] = [];
 
   [...estrategias, "MIX"].forEach(est => {
 
     const serieRaw = data
+      .filter(r =>
+        est !== "MIX" ||
+        (r["MIX"] !== "" &&
+        r["MIX"] !== null &&
+        r["MIX"] !== undefined)
+      )
       .map(r => Number(r[est]))
       .filter(v => !isNaN(v));
-
     if (serieRaw.length === 0) return;
 
     const serie = serieRaw.map(v => v / 100);
@@ -274,7 +392,7 @@ export const calcularMetricas = (data: any[], estrategias: string[]) => {
 };
 
 export function calcularDireccion(data: any[], estrategias: string[]) {
-
+  data = reconstruirMix(data);
   const resultados: any[] = [];
 
   const df = data.map(row => ({
@@ -333,7 +451,7 @@ export function calcularDireccion(data: any[], estrategias: string[]) {
 }
 
 export const calcularFiltros = (data: any[]) => {
-
+  data = reconstruirMix(data);
   const res: any[] = [];
 
   const filtered = data.filter(
@@ -399,7 +517,7 @@ export const calcularFiltros = (data: any[]) => {
 };
 
 export const calcularTopPorPar = (data: any[]) => {
-
+  data = reconstruirMix(data);
   const filtrado = data.filter(
     r => String(r["Contabilizar"]).toUpperCase() === "SI"
   );
