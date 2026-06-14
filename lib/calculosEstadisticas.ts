@@ -58,7 +58,16 @@ const reconstruirMix = (data: any[]) => {
 
     const mejor = mejores[row["Día semana"]];
 
-    let mix = "";
+    let mix: number | null = null;
+
+    if (!isNaN(val)) {
+      mix = val;
+    }
+
+    return {
+      ...row,
+      MIX: mix
+    };
 
     if (mejor) {
 
@@ -288,13 +297,10 @@ export const calcularMetricas = (data: any[], estrategias: string[]) => {
     const serieRaw = data
       .filter(r =>
         est !== "MIX" ||
-        (r["MIX"] !== "" &&
-        r["MIX"] !== null &&
-        r["MIX"] !== undefined)
+        r["MIX"] !== null
       )
       .map(r => Number(r[est]))
       .filter(v => !isNaN(v));
-    if (serieRaw.length === 0) return;
 
     const serie = serieRaw.map(v => v / 100);
 
