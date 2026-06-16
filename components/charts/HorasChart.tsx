@@ -2,9 +2,10 @@
 
 import Plot from "react-plotly.js";
 import { getPlotlyLayout } from "@/lib/plotlyStyle";
+import { reconstruirMix } from "@/lib/calculosEstadisticas";
 
 export default function HorasChart({ data, estrategias }: any) {
-
+  const dataMix = reconstruirMix(data);
   const dias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
 
   const parseFecha = (str: string) => {
@@ -55,7 +56,7 @@ export default function HorasChart({ data, estrategias }: any) {
 
         if (!estrategia || estrategia === "id") return null;
 
-        const filtered = data;
+        const filtered = dataMix
 
         const global = procesar(filtered, estrategia);
 

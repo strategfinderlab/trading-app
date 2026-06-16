@@ -2,6 +2,7 @@
 
 import Plot from "react-plotly.js";
 import { getPlotlyLayout } from "@/lib/plotlyStyle";
+import { reconstruirMix } from "@/lib/calculosEstadisticas";
 
 type Props = {
   data: any[];
@@ -19,7 +20,8 @@ export default function SLChart({ data, estrategias }: Props) {
     <div className="flex flex-col gap-12">
       {estrategiasLimpias.map((estrategia: string) => {
 
-        const filtered = data
+        const dataMix = reconstruirMix(data);
+        const filtered = dataMix
           .filter((r: any) =>
             String(r["Contabilizar"]).toUpperCase() === "SI" &&
             r["Tamaño SL"] !== "" &&

@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { reconstruirMix } from "@/lib/calculosEstadisticas";
 
 const Plot = dynamic(() => import("react-plotly.js"), {
   ssr: false
@@ -8,7 +9,7 @@ const Plot = dynamic(() => import("react-plotly.js"), {
 import { getPlotlyLayout } from "@/lib/plotlyStyle";
 
 export default function SemanalChart({ data, estrategias }: any) {
-
+  const dataMix = reconstruirMix(data);
   const parseFecha = (fecha: string) => {
     if (!fecha) return null;
 

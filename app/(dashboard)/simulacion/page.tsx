@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { calcularMontecarlo } from "@/lib/montecarlo";
 import dynamic from "next/dynamic";
+import { reconstruirMix } from "@/lib/calculosEstadisticas";
 
 const MontecarloChart = dynamic(
   () => import("../../../components/charts/MontecarloChart"),
@@ -28,18 +29,19 @@ export default function SimulacionPage() {
 
   useEffect(() => {
 
-    const data = JSON.parse(localStorage.getItem("entradas") || "[]");
+    const data = JSON.parse(
+      localStorage.getItem("entradas") || "[]"
+    );
 
-    const clean = data
-      .filter((r:any)=>r.Contabilizar==="SI")
-      .map((r:any)=>{
-        let v = String(r.MIX || "")
-          .replace("R","")
-          .replace("BE","0")
-          .replace(",",".");
-        return Number(v)/100;
-      })
-      .filter((v:number)=>!isNaN(v));
+    const dataMix = reconstruirMix(data);
+
+    const clean = dataMix
+      .filter(
+        (r:any) =>
+          r.Contabilizar === "SI" &&
+          r.MIX !== null
+      )
+      .map((r:any) => Number(r.MIX) / 100);
 
     setReturns(clean);
 
@@ -104,9 +106,15 @@ export default function SimulacionPage() {
   const finalReturns = equityPaths.map((p:any)=>p[p.length-1] - 1);
 
   const equityReal = returns.reduce((acc:number[], r:number)=>{
-    const last = acc.length ? acc[acc.length-1] : 1;
-    acc.push(last + r);
+
+    const last = acc.length
+      ? acc[acc.length-1]
+      : 1;
+
+    acc.push(last * (1 + r));
+
     return acc;
+
   },[]);
 
   return (

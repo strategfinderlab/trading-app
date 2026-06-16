@@ -1,4 +1,4 @@
-const reconstruirMix = (data: any[]) => {
+export const reconstruirMix = (data: any[]) => {
 
   const clean = [...data];
 

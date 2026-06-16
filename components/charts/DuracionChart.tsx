@@ -2,9 +2,10 @@
 
 import Plot from "react-plotly.js";
 import { getPlotlyLayout } from "@/lib/plotlyStyle";
+import { reconstruirMix } from "@/lib/calculosEstadisticas";
 
 export default function DuracionChart({ data, mejores }: any) {
-
+  const dataMix = reconstruirMix(data);
   const dias = ["Lunes","Martes","Miércoles","Jueves","Viernes"];
 
   return (
@@ -14,7 +15,7 @@ export default function DuracionChart({ data, mejores }: any) {
         const estrategia = mejores[dia];
         if (!estrategia) return null;
 
-        const filtered = data
+        const filtered = dataMix
           .filter((r: any) =>
             r["Día semana"] === dia &&
             r["Duración"] !== "" &&
