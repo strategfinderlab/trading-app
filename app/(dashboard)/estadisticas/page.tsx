@@ -179,6 +179,7 @@ export default function EstadisticasPage() {
               <th className="border px-3 py-2">Estrategia</th>
               <th className="border px-3 py-2">Suma</th>
               <th className="border px-3 py-2">Filas</th>
+              <th className="border px-3 py-2">% BE</th>
               <th className="border px-3 py-2">% Positivo</th>
             </tr>
           </thead>
@@ -203,6 +204,10 @@ export default function EstadisticasPage() {
 
                 <td className="border px-3 py-2">
                   {row.filas}
+                </td>
+
+                <td className="border px-3 py-2">
+                  {row.be.toFixed(2)}%
                 </td>
 
                 <td className="border px-3 py-2">
@@ -303,7 +308,7 @@ export default function EstadisticasPage() {
         </td>
 
         <td className={`border border-[#444] px-3 py-2 ${row.expectancy>0.002?"bg-[#d4af37] text-black":""}`}>
-        {row.expectancy.toFixed(4)}
+        {row.expectancy.toFixed(2)} R
         </td>
 
         <td className={`border border-[#444] px-3 py-2 ${row.profitFactor>1.5?"bg-[#d4af37] text-black":""}`}>
@@ -318,8 +323,8 @@ export default function EstadisticasPage() {
         {row.sqn.toFixed(2)}
         </td>
 
-        <td className={`border border-[#444] px-3 py-2 ${row.maxDD>-0.15?"bg-[#d4af37] text-black":""}`}>
-        {(row.maxDD*100).toFixed(2)}%
+        <td className={`border border-[#444] px-3 py-2 ${row.maxDD<8?"bg-[#d4af37] text-black":""}`}>
+        {row.maxDD.toFixed(2)} R
         </td>
 
         <td className={`border border-[#444] px-3 py-2 ${row.riskOfRuin<0.01?"bg-[#d4af37] text-black":""}`}>
@@ -327,7 +332,7 @@ export default function EstadisticasPage() {
         </td>
 
         <td className={`border border-[#444] px-3 py-2 ${row.retornoTotal>0?"bg-[#d4af37] text-black":""}`}>
-        {(row.retornoTotal*100).toFixed(2)}%
+        {row.retornoTotal.toFixed(2)} R
         </td>
 
         <td className={`border border-[#444] px-3 py-2 ${row.calmar>1?"bg-[#d4af37] text-black":""}`}>
@@ -373,11 +378,11 @@ export default function EstadisticasPage() {
 
       <p>SQN: System Quality Number. &gt;2 sólido; &gt;3 excelente; &gt;5 profesional.</p>
 
-      <p>Max Drawdown: Mayor caída desde máximo histórico. &lt;10% excelente; &gt;25% riesgo alto.</p>
+      <p>Max Drawdown: Mayor caída acumulada medida en R. Cuanto menor sea, mejor.</p>
 
       <p>Risk of Ruin: Probabilidad de perder el capital. &lt;1% muy seguro.</p>
 
-      <p>Retorno Total: Crecimiento acumulado.</p>
+      <p>Retorno Total: Beneficio acumulado expresado en R.</p>
 
       <p>Calmar: Relación retorno/drawdown. &gt;1 aceptable; &gt;3 bueno.</p>
 

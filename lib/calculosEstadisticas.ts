@@ -280,123 +280,287 @@ export const calcularTop3PorDia = (tabla: any, dias: string[]) => {
 };
 
 export const calcularMetricas = (data: any[], estrategias: string[]) => {
+
   data = reconstruirMix(data);
+
+  // Solo operaciones contabilizadas
+  data = data.filter(
+    r => String(r["Contabilizar"]).toUpperCase() === "SI"
+  );
 
   const resultados: any[] = [];
 
   [...estrategias, "MIX"].forEach(est => {
 
-    const serieRaw = data
-      .filter(r =>
-        est !== "MIX" ||
-        r["MIX"] !== null
-      )
+    // Serie en R
+    const serieR = data
+      .filter(r => est !== "MIX" || r["MIX"] !== null)
       .map(r => Number(r[est]))
       .filter(v => !isNaN(v));
 
-    const serie = serieRaw.map(v => v / 100);
+    if (serieR.length === 0) return;
 
-    const total = serie.length;
-    const wins = serie.filter(v => v > 0);
-    const losses = serie.filter(v => v < 0);
+    // Serie porcentual únicamente para Sharpe y SQN
+    const seriePct = serieR.map(v => v / 100);
 
-    const winrate = wins.length / total;
+    // Clasificación
+    const wins = serieR.filter(v => v > 0);
+    const losses = serieR.filter(v => v < 0);
+    const be = serieR.filter(v => v === 0);
 
-    const avgWin = wins.length ? wins.reduce((a,b)=>a+b,0)/wins.length : 0;
-    const avgLoss = losses.length ? Math.abs(losses.reduce((a,b)=>a+b,0)/losses.length) : 0;
+    const operaciones = wins.length + losses.length;
 
-    const profitFactor = losses.length
-      ? wins.reduce((a,b)=>a+b,0) / Math.abs(losses.reduce((a,b)=>a+b,0))
-      : 0;
+    const winrate =
+      operaciones > 0
+        ? wins.length / operaciones
+        : 0;
 
-    const expectancy = (winrate * avgWin) - ((1 - winrate) * avgLoss);
+    const lossrate =
+      operaciones > 0
+        ? losses.length / operaciones
+        : 0;
 
-    const mean = serie.reduce((a,b)=>a+b,0) / total;
-    const std = Math.sqrt(serie.reduce((a,v)=>a + Math.pow(v - mean,2),0)/total);
+    const beRate =
+      serieR.length > 0
+        ? be.length / serieR.length
+        : 0;
 
-    const sharpe = std !== 0 ? (mean / std) * Math.sqrt(252) : 0;
-    const sqn = std !== 0 ? (mean / std) * Math.sqrt(total) : 0;
+    // Ganancias y pérdidas medias (R)
+    const avgWin =
+      wins.length
+        ? wins.reduce((a, b) => a + b, 0) / wins.length
+        : 0;
 
-    const payoff = avgLoss !== 0 ? avgWin / avgLoss : 0;
-    const kelly = payoff !== 0 ? (winrate - (1 - winrate)/payoff) : 0;
+    const avgLoss =
+      losses.length
+        ? Math.abs(losses.reduce((a, b) => a + b, 0) / losses.length)
+        : 0;
 
+    // Expectancy en R
+    const expectancy =
+      (winrate * avgWin) -
+      (lossrate * avgLoss);
+
+    // Profit Factor
+    const grossProfit =
+      wins.reduce((a, b) => a + b, 0);
+
+    const grossLoss =
+      Math.abs(
+        losses.reduce((a, b) => a + b, 0)
+      );
+
+    const profitFactor =
+      grossLoss > 0
+        ? grossProfit / grossLoss
+        : grossProfit > 0
+          ? 999
+          : 0;
+
+    // Payoff
+    const payoff =
+      avgLoss > 0
+        ? avgWin / avgLoss
+        : 0;
+
+    // Kelly
+    const kelly =
+      payoff > 0
+        ? winrate - (lossrate / payoff)
+        : 0;
+
+    // Sharpe (sobre R)
+    const mediaR =
+      serieR.reduce((a, b) => a + b, 0) /
+      serieR.length;
+
+    const desviacionR = Math.sqrt(
+      serieR.reduce(
+        (a, v) => a + Math.pow(v - mediaR, 2),
+        0
+      ) / serieR.length
+    );
+
+    const sharpe =
+      desviacionR > 0
+        ? mediaR / desviacionR
+        : 0;
+    // SQN
+    const sqn =
+      desviacionR > 0
+        ? (mediaR / desviacionR) *
+          Math.sqrt(serieR.length)
+        : 0;
+    // Máxima racha de pérdidas
     let maxLosses = 0;
-    let current = 0;
+    let actualLosses = 0;
 
-    serie.forEach(v => {
+    serieR.forEach(v => {
+
       if (v < 0) {
-        current++;
-        maxLosses = Math.max(maxLosses, current);
+        actualLosses++;
+        maxLosses = Math.max(
+          maxLosses,
+          actualLosses
+        );
       } else {
-        current = 0;
+        actualLosses = 0;
       }
+
     });
 
-    const consistency = winrate * profitFactor;
+    // Consistency
+    const positiveMonths =
+      serieR.filter(v => v > 0).length;
 
-    let equity = [1];
-    serie.forEach(r => {
-      equity.push(equity[equity.length - 1] * (1 + r));
+    const consistency =
+      positiveMonths / serieR.length;
+    // Curva de capital en R
+    const equity = [0];
+
+    serieR.forEach(r => {
+      equity.push(
+        equity[equity.length - 1] + r
+      );
     });
 
+        // Max Drawdown en R
     let peak = equity[0];
     let maxDD = 0;
 
     equity.forEach(v => {
-      if (v > peak) peak = v;
-      const dd = (v - peak) / peak;
-      if (dd < maxDD) maxDD = dd;
+
+      if (v > peak) {
+        peak = v;
+      }
+
+      const dd = peak - v;
+
+      if (dd > maxDD) {
+        maxDD = dd;
+      }
+
     });
 
-    const retornoTotal = equity[equity.length - 1] - 1;
-    const calmar = maxDD !== 0 ? retornoTotal / Math.abs(maxDD) : 0;
+    // Retorno total en R
+    const retornoTotal =
+      equity[equity.length - 1];
+
+    // Calmar
+    const calmar =
+      maxDD > 0
+        ? retornoTotal / maxDD
+        : retornoTotal > 0
+          ? 999
+          : 0;
+
+    // 🔥 Risk of Ruin (aproximación basada en WinRate y Payoff)
 
     let riskOfRuin = 1;
-    if (avgLoss > 0 && avgWin > 0) {
-      const p = winrate;
-      const q = 1 - p;
-      if (p > q) riskOfRuin = Math.pow(q/p, 100);
+
+    if (expectancy > 0) {
+
+        riskOfRuin =
+            Math.exp(
+                -2 *
+                expectancy *
+                (100 / Math.max(maxDD, 1))
+            );
+
+        riskOfRuin = Math.min(
+            Math.max(riskOfRuin, 0),
+            1
+        );
+
     }
 
+    // Score normalizado
     const score =
-      expectancy * 500 +
-      profitFactor * 2 +
-      calmar * 2 +
-      consistency * 3 +
-      kelly * 5 +
-      (1 - Math.abs(maxDD)) * 3;
+
+      expectancy * 40 +
+
+      Math.min(profitFactor, 3) * 8 +
+
+      Math.min(calmar, 10) * 3 +
+
+      Math.min(sharpe, 5) * 2 +
+
+      Math.min(sqn, 5) * 2 +
+
+      Math.max(
+        0,
+        10 - maxDD
+      ) +
+
+      payoff * 4 +
+
+      Math.max(
+        0,
+        kelly
+      ) * 20 +
+
+      consistency * 10 +
+
+      (1 - riskOfRuin) * 20;
 
     resultados.push({
+
       estrategia: est,
+
       winrate,
+
+      beRate,
+
       expectancy,
+
       profitFactor,
+
       sharpe,
+
       sqn,
+
       maxDD,
+
       riskOfRuin,
+
       retornoTotal,
+
       calmar,
+
       payoff,
+
       kelly,
+
       maxLosses,
+
       consistency,
+
       score
+
     });
 
   });
 
-  return resultados.sort((a, b) => b.score - a.score);
+  return resultados.sort(
+    (a, b) => b.score - a.score
+  );
+
 };
 
 export function calcularDireccion(data: any[], estrategias: string[]) {
   data = reconstruirMix(data);
-  const resultados: any[] = [];
 
-  const df = data.map(row => ({
-    ...row,
-    "Direc": (row["Direc"] || "").toString().trim().toLowerCase()
-  }));
+  // 🔥 Solo operaciones contabilizadas
+  const df = data
+    .filter(
+      row => String(row["Contabilizar"]).toUpperCase() === "SI"
+    )
+    .map(row => ({
+      ...row,
+      Direc: (row["Direc"] || "").toString().trim().toLowerCase()
+    }));
+
+  const resultados: any[] = [];
 
   ["alcista", "bajista"].forEach(tipo => {
 
@@ -414,7 +578,7 @@ export function calcularDireccion(data: any[], estrategias: string[]) {
       resumen[est] = valores.reduce((a, b) => a + b, 0);
     });
 
-    // 🔥 TOP 3 SIN MIX
+    // TOP 3 (sin MIX)
     const top3 = Object.keys(resumen)
       .sort((a, b) => resumen[b] - resumen[a])
       .slice(0, 3);
@@ -431,14 +595,24 @@ export function calcularDireccion(data: any[], estrategias: string[]) {
       const suma = valores.reduce((a, b) => a + b, 0);
 
       const positivos = valores.filter(v => v > 0).length;
-      const pct = total > 0 ? (positivos / total) * 100 : 0;
+      const negativos = valores.filter(v => v < 0).length;
+      const be = valores.filter(v => v === 0).length;
+
+      const pctBE =
+        total > 0 ? (be / total) * 100 : 0;
+
+      const pctPositivo =
+        (positivos + negativos) > 0
+          ? (positivos / (positivos + negativos)) * 100
+          : 0;
 
       resultados.push({
         tipo: tipo.charAt(0).toUpperCase() + tipo.slice(1),
         estrategia: est,
         suma,
         filas: total,
-        acierto: pct
+        be: pctBE,
+        acierto: pctPositivo
       });
 
     });
