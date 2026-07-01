@@ -46,7 +46,7 @@ export default function EstadisticasPage() {
 
   if (!stats) return null;
 
-  const { tabla, estrategias, dias, filaConteo, filaAcierto } = stats;
+  const { tabla, estrategias, dias, filaConteo } = stats;
 
   const data = stats?.rawData || [];
 
@@ -112,14 +112,6 @@ export default function EstadisticasPage() {
               ))}
             </tr>
 
-            {/* % ACIERTO */}
-            <tr className="bg-[#111] text-[#d4af37] font-bold">
-              <td className="px-4 py-2 border border-[#444]">% Acierto</td>
-              {filaAcierto.map((v: number, i: number) => (
-                <td key={i} className="border px-4 py-2">{v.toFixed(2)}%</td>
-              ))}
-            </tr>
-
             {/* ESTRATEGIAS */}
             {estrategias.map((est: string) => (
               <tr key={est}>
@@ -179,8 +171,9 @@ export default function EstadisticasPage() {
               <th className="border px-3 py-2">Estrategia</th>
               <th className="border px-3 py-2">Suma</th>
               <th className="border px-3 py-2">Filas</th>
+              <th className="border px-3 py-2">% TP</th>
               <th className="border px-3 py-2">% BE</th>
-              <th className="border px-3 py-2">% Positivo</th>
+              <th className="border px-3 py-2">% SL</th>
             </tr>
           </thead>
 
@@ -207,11 +200,15 @@ export default function EstadisticasPage() {
                 </td>
 
                 <td className="border px-3 py-2">
-                  {row.be.toFixed(2)}%
+                  {row.pctTP.toFixed(2)}%
                 </td>
 
                 <td className="border px-3 py-2">
-                  {row.acierto.toFixed(2)}%
+                  {row.pctBE.toFixed(2)}%
+                </td>
+
+                <td className="border px-3 py-2">
+                  {row.pctSL.toFixed(2)}%
                 </td>
               </tr>
             ))}
@@ -277,21 +274,21 @@ export default function EstadisticasPage() {
 
         <thead>
         <tr className="bg-[#2c3e50] text-white">
-        <th className="border border-[#444] px-3 py-2">Estrategia</th>
-        <th className="border border-[#444] px-3 py-2">WinRate</th>
-        <th className="border border-[#444] px-3 py-2">Expectancy</th>
-        <th className="border border-[#444] px-3 py-2">ProfitFactor</th>
-        <th className="border border-[#444] px-3 py-2">Sharpe</th>
-        <th className="border border-[#444] px-3 py-2">SQN</th>
-        <th className="border border-[#444] px-3 py-2">MaxDD</th>
-        <th className="border border-[#444] px-3 py-2">Risk</th>
-        <th className="border border-[#444] px-3 py-2">Retorno</th>
-        <th className="border border-[#444] px-3 py-2">Calmar</th>
-        <th className="border border-[#444] px-3 py-2">Payoff</th>
-        <th className="border border-[#444] px-3 py-2">Kelly</th>
-        <th className="border border-[#444] px-3 py-2">MaxLoss</th>
-        <th className="border border-[#444] px-3 py-2">Consistency</th>
-        <th className="border border-[#444] px-3 py-2">Score</th>
+          <th className="border border-[#444] px-3 py-2">Estrategia</th>
+          <th className="border border-[#444] px-3 py-2">% TP</th>
+          <th className="border border-[#444] px-3 py-2">% BE</th>
+          <th className="border border-[#444] px-3 py-2">% SL</th>
+          <th className="border border-[#444] px-3 py-2">Expectancy</th>
+          <th className="border border-[#444] px-3 py-2">Profit Factor</th>
+          <th className="border border-[#444] px-3 py-2">Sharpe</th>
+          <th className="border border-[#444] px-3 py-2">SQN</th>
+          <th className="border border-[#444] px-3 py-2">Max DD</th>
+          <th className="border border-[#444] px-3 py-2">Retorno</th>
+          <th className="border border-[#444] px-3 py-2">Calmar</th>
+          <th className="border border-[#444] px-3 py-2">Payoff</th>
+          <th className="border border-[#444] px-3 py-2">Kelly</th>
+          <th className="border border-[#444] px-3 py-2">Max Loss</th>
+          <th className="border border-[#444] px-3 py-2">Score</th>
         </tr>
         </thead>
 
@@ -303,11 +300,27 @@ export default function EstadisticasPage() {
         {row.estrategia}
         </td>
 
-        <td className={`border border-[#444] px-3 py-2 ${row.winrate>0.55?"bg-[#d4af37] text-black":""}`}>
-        {(row.winrate*100).toFixed(2)}%
+        <td
+          className={`border border-[#444] px-3 py-2 ${
+            row.tpRate > 0.55 ? "bg-[#d4af37] text-black" : ""
+          }`}
+        >
+          {(row.tpRate * 100).toFixed(2)}%
         </td>
 
-        <td className={`border border-[#444] px-3 py-2 ${row.expectancy>0.002?"bg-[#d4af37] text-black":""}`}>
+        <td className="border border-[#444] px-3 py-2">
+          {(row.beRate * 100).toFixed(2)}%
+        </td>
+
+        <td
+          className={`border border-[#444] px-3 py-2 ${
+            row.slRate < 0.35 ? "bg-[#d4af37] text-black" : ""
+          }`}
+        >
+          {(row.slRate * 100).toFixed(2)}%
+        </td>
+
+        <td className={`border border-[#444] px-3 py-2 ${row.expectancy>0.5?"bg-[#d4af37] text-black":""}`}>
         {row.expectancy.toFixed(2)} R
         </td>
 
@@ -315,7 +328,7 @@ export default function EstadisticasPage() {
         {row.profitFactor.toFixed(2)}
         </td>
 
-        <td className={`border border-[#444] px-3 py-2 ${row.sharpe>0.5?"bg-[#d4af37] text-black":""}`}>
+        <td className={`border border-[#444] px-3 py-2 ${row.sharpe>0.4?"bg-[#d4af37] text-black":""}`}>
         {row.sharpe.toFixed(2)}
         </td>
 
@@ -327,15 +340,11 @@ export default function EstadisticasPage() {
         {row.maxDD.toFixed(2)} R
         </td>
 
-        <td className={`border border-[#444] px-3 py-2 ${row.riskOfRuin<0.01?"bg-[#d4af37] text-black":""}`}>
-        {(row.riskOfRuin*100).toFixed(4)}%
-        </td>
-
-        <td className={`border border-[#444] px-3 py-2 ${row.retornoTotal>0?"bg-[#d4af37] text-black":""}`}>
+        <td className={`border border-[#444] px-3 py-2 ${row.retornoTotal>30?"bg-[#d4af37] text-black":""}`}>
         {row.retornoTotal.toFixed(2)} R
         </td>
 
-        <td className={`border border-[#444] px-3 py-2 ${row.calmar>1?"bg-[#d4af37] text-black":""}`}>
+        <td className={`border border-[#444] px-3 py-2 ${row.calmar>5?"bg-[#d4af37] text-black":""}`}>
         {row.calmar.toFixed(2)}
         </td>
 
@@ -343,19 +352,15 @@ export default function EstadisticasPage() {
         {row.payoff.toFixed(2)}
         </td>
 
-        <td className={`border border-[#444] px-3 py-2 ${row.kelly>0?"bg-[#d4af37] text-black":""}`}>
+        <td className={`border border-[#444] px-3 py-2 ${row.kelly>0.35?"bg-[#d4af37] text-black":""}`}>
         {row.kelly.toFixed(2)}
         </td>
 
-        <td className={`border border-[#444] px-3 py-2 ${row.maxLosses<5?"bg-[#d4af37] text-black":""}`}>
+        <td className={`border border-[#444] px-3 py-2 ${row.maxLosses<=5?"bg-[#d4af37] text-black":""}`}>
         {row.maxLosses}
         </td>
 
-        <td className={`border border-[#444] px-3 py-2 ${row.consistency>1.5?"bg-[#d4af37] text-black":""}`}>
-        {row.consistency.toFixed(2)}
-        </td>
-
-        <td className={`border border-[#444] px-3 py-2 ${row.score>30?"bg-[#d4af37] text-black":""}`}>
+        <td className={`border border-[#444] px-3 py-2 ${row.score>100?"bg-[#d4af37] text-black":""}`}>
         {row.score.toFixed(2)}
         </td>
 
@@ -370,17 +375,15 @@ export default function EstadisticasPage() {
 
       <p>WinRate: Porcentaje de operaciones ganadoras. Mide la frecuencia de acierto pero no la rentabilidad. &gt;60% indica alta consistencia; sistemas con menor winrate requieren mayor payoff.</p>
 
-      <p>Expectancy: Beneficio esperado por operación. Es la métrica más importante del sistema. &gt;0 indica ventaja estadística; &gt;0.002 es bueno; &gt;0.005 es muy sólido.</p>
+      <p>Expectancy: Beneficio esperado por operación expresado en R. Es la métrica más importante del sistema. &gt;0 R indica ventaja estadística; &gt;0.30 R es bueno; &gt;0.50 R muy sólido; &gt;1 R excepcional.</p>
 
       <p>Profit Factor: Relación entre ganancias totales y pérdidas totales. &gt;1.5 indica robustez; &gt;2 muy bueno; &gt;3 puede implicar sobreoptimización.</p>
 
-      <p>Sharpe: Rentabilidad ajustada por volatilidad total. &gt;1 aceptable; &gt;2 bueno; &gt;3 excelente.</p>
+      <p>Sharpe: Rentabilidad ajustada por volatilidad por operación. &gt;0.30 aceptable; &gt;0.50 bueno; &gt;0.70 excelente.</p>
 
       <p>SQN: System Quality Number. &gt;2 sólido; &gt;3 excelente; &gt;5 profesional.</p>
 
       <p>Max Drawdown: Mayor caída acumulada medida en R. Cuanto menor sea, mejor.</p>
-
-      <p>Risk of Ruin: Probabilidad de perder el capital. &lt;1% muy seguro.</p>
 
       <p>Retorno Total: Beneficio acumulado expresado en R.</p>
 
@@ -391,8 +394,6 @@ export default function EstadisticasPage() {
       <p>Kelly: Fracción óptima de riesgo.</p>
 
       <p>Max Losses: Máxima racha de pérdidas.</p>
-
-      <p>Consistency: WinRate × ProfitFactor.</p>
 
       </div>
       

@@ -308,21 +308,21 @@ export const calcularMetricas = (data: any[], estrategias: string[]) => {
     const losses = serieR.filter(v => v < 0);
     const be = serieR.filter(v => v === 0);
 
-    const operaciones = wins.length + losses.length;
+    const total = serieR.length;
 
-    const winrate =
-      operaciones > 0
-        ? wins.length / operaciones
-        : 0;
-
-    const lossrate =
-      operaciones > 0
-        ? losses.length / operaciones
+    const tpRate =
+      total > 0
+        ? wins.length / total
         : 0;
 
     const beRate =
-      serieR.length > 0
-        ? be.length / serieR.length
+      total > 0
+        ? be.length / total
+        : 0;
+
+    const slRate =
+      total > 0
+        ? losses.length / total
         : 0;
 
     // Ganancias y pérdidas medias (R)
@@ -338,9 +338,8 @@ export const calcularMetricas = (data: any[], estrategias: string[]) => {
 
     // Expectancy en R
     const expectancy =
-      (winrate * avgWin) -
-      (lossrate * avgLoss);
-
+      (tpRate * avgWin) -
+      (slRate * avgLoss);
     // Profit Factor
     const grossProfit =
       wins.reduce((a, b) => a + b, 0);
@@ -366,7 +365,7 @@ export const calcularMetricas = (data: any[], estrategias: string[]) => {
     // Kelly
     const kelly =
       payoff > 0
-        ? winrate - (lossrate / payoff)
+        ? tpRate - (slRate / payoff)
         : 0;
 
     // Sharpe (sobre R)
@@ -409,12 +408,6 @@ export const calcularMetricas = (data: any[], estrategias: string[]) => {
 
     });
 
-    // Consistency
-    const positiveMonths =
-      serieR.filter(v => v > 0).length;
-
-    const consistency =
-      positiveMonths / serieR.length;
     // Curva de capital en R
     const equity = [0];
 
@@ -454,90 +447,62 @@ export const calcularMetricas = (data: any[], estrategias: string[]) => {
           ? 999
           : 0;
 
-    // 🔥 Risk of Ruin (aproximación basada en WinRate y Payoff)
-
-    let riskOfRuin = 1;
-
-    if (expectancy > 0) {
-
-        riskOfRuin =
-            Math.exp(
-                -2 *
-                expectancy *
-                (100 / Math.max(maxDD, 1))
-            );
-
-        riskOfRuin = Math.min(
-            Math.max(riskOfRuin, 0),
-            1
-        );
-
-    }
-
     // Score normalizado
     const score =
 
-      expectancy * 40 +
+      expectancy * 60 +
 
-      Math.min(profitFactor, 3) * 8 +
+      Math.min(profitFactor, 5) * 8 +
 
       Math.min(calmar, 10) * 3 +
 
-      Math.min(sharpe, 5) * 2 +
+      Math.min(sharpe, 5) * 3 +
 
-      Math.min(sqn, 5) * 2 +
+      Math.min(sqn, 6) * 4 +
 
-      Math.max(
-        0,
-        10 - maxDD
-      ) +
+      20 / (1 + maxDD) +
 
-      payoff * 4 +
+      payoff * 2 +
 
-      Math.max(
-        0,
-        kelly
-      ) * 20 +
+      Math.max(0, kelly) * 8 +
 
-      consistency * 10 +
-
-      (1 - riskOfRuin) * 20;
+      tpRate * 8 +
+      beRate * 2 -
+      slRate * 10;
 
     resultados.push({
 
-      estrategia: est,
+    estrategia: est,
 
-      winrate,
+    tpRate,
 
-      beRate,
+    beRate,
 
-      expectancy,
+    slRate,
 
-      profitFactor,
+    expectancy,
 
-      sharpe,
+    profitFactor,
 
-      sqn,
+    sharpe,
 
-      maxDD,
+    sqn,
 
-      riskOfRuin,
+    maxDD,
 
-      retornoTotal,
+    retornoTotal,
 
-      calmar,
+    calmar,
 
-      payoff,
+    payoff,
 
-      kelly,
+    kelly,
 
-      maxLosses,
+    maxLosses,
 
-      consistency,
+    score
 
-      score
-
-    });
+  });
 
   });
 
@@ -596,23 +561,25 @@ export function calcularDireccion(data: any[], estrategias: string[]) {
 
       const positivos = valores.filter(v => v > 0).length;
       const negativos = valores.filter(v => v < 0).length;
-      const be = valores.filter(v => v === 0).length;
+      const be = total - positivos - negativos;
+
+      const pctTP =
+        total > 0 ? (positivos / total) * 100 : 0;
 
       const pctBE =
         total > 0 ? (be / total) * 100 : 0;
 
-      const pctPositivo =
-        (positivos + negativos) > 0
-          ? (positivos / (positivos + negativos)) * 100
-          : 0;
+      const pctSL =
+        total > 0 ? (negativos / total) * 100 : 0;
 
       resultados.push({
         tipo: tipo.charAt(0).toUpperCase() + tipo.slice(1),
         estrategia: est,
         suma,
         filas: total,
-        be: pctBE,
-        acierto: pctPositivo
+        pctTP,
+        pctBE,
+        pctSL
       });
 
     });
