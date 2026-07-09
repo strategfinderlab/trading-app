@@ -9,10 +9,14 @@ import { calcularMetricas } from "@/lib/calculosEstadisticas";
 import { calcularFiltros } from "@/lib/calculosEstadisticas";
 import { calcularTopPorPar } from "@/lib/calculosEstadisticas";
 import TopPorParChart from "@/components/charts/TopPorParChart";
+import { calcularPrediccion } from "@/lib/calculosPrediccion";
 
 export default function EstadisticasPage() {
 
   const [stats, setStats] = useState<any>(null);
+  const [estrategiaPred, setEstrategiaPred] = useState("MIX");
+  const [direccionPred, setDireccionPred] = useState("Todas");
+  const [diaPred, setDiaPred] = useState("Todos");
 
   useEffect(() => {
 
@@ -81,6 +85,39 @@ export default function EstadisticasPage() {
 
   const { topNombres, topValores } = calcularTop3PorDia(tabla, dias);
   const topPar = calcularTopPorPar(data);
+  const prediccion = calcularPrediccion(
+    data,
+    estrategiaPred,
+    direccionPred === "Todas" ? null : direccionPred,
+    diaPred === "Todos" ? null : diaPred,
+    20
+  );
+
+  const deltaTP = (prediccion.tp - prediccion.tpGlobal) * 100;
+  const deltaBE = (prediccion.be - prediccion.beGlobal) * 100;
+  const deltaSL = (prediccion.sl - prediccion.slGlobal) * 100;
+
+  function interpretarVentaja(delta: number, tipo: "TP" | "BE" | "SL") {
+
+      if (tipo === "TP") {
+
+          if (delta >= 10) return "🟢 Muy favorable";
+          if (delta >= 5) return "🟢 Favorable";
+          if (delta >= -5) return "🟡 Neutral";
+
+          return "🔴 Desfavorable";
+
+      }
+
+      // Para BE y SL cuanto MENOS mejor
+
+      if (delta <= -10) return "🟢 Muy favorable";
+      if (delta <= -5) return "🟢 Favorable";
+      if (delta <= 5) return "🟡 Neutral";
+
+      return "🔴 Desfavorable";
+
+  }
 
   return (
     <div className="text-white">
@@ -396,7 +433,361 @@ export default function EstadisticasPage() {
       <p>Max Losses: Máxima racha de pérdidas.</p>
 
       </div>
+
+            <h2 className="text-2xl font-bold mb-6 border-b border-[#d4af37] pb-2">
+      🧠 Predicción próxima operación
+      </h2>
+
+      <div className="flex flex-wrap gap-6 justify-center items-end mb-8">
+
+          <div>
+
+              <label className="block mb-1 text-[#d4af37]">
+                  Estrategia
+              </label>
+
+              <select
+                  value={estrategiaPred}
+                  onChange={(e)=>setEstrategiaPred(e.target.value)}
+                  className="bg-black border border-[#444] p-2"
+              >
+
+                  <option>MIX</option>
+
+                  {estrategias
+                      .filter((e:string)=>e!=="MIX")
+                      .map((e:string)=>
+
+                          <option key={e}>
+                              {e}
+                          </option>
+
+                      )}
+
+              </select>
+
+          </div>
+
+          <div>
+
+              <label className="block mb-1 text-[#d4af37]">
+                  Dirección
+              </label>
+
+              <select
+                  value={direccionPred}
+                  onChange={(e)=>setDireccionPred(e.target.value)}
+                  className="bg-black border border-[#444] p-2"
+              >
+
+                  <option>Todas</option>
+                  <option>alcista</option>
+                  <option>bajista</option>
+
+              </select>
+
+          </div>
+
+          <div>
+
+              <label className="block mb-1 text-[#d4af37]">
+                  Día
+              </label>
+
+              <select
+                  value={diaPred}
+                  onChange={(e)=>setDiaPred(e.target.value)}
+                  className="bg-black border border-[#444] p-2"
+              >
+
+                  <option>Todos</option>
+
+                  {dias.map((d:string)=>
+
+                      <option key={d}>
+                          {d}
+                      </option>
+
+                  )}
+
+              </select>
+
+          </div>
+
+      </div>
+
+      <div className="flex justify-center">
+
+      <table className="border border-[#444] text-center">
+
+      <thead>
+
+      <tr className="bg-[#2c3e50]">
+
+      <th className="border border-[#444] px-5 py-2">
+      TP
+      </th>
+
+      <th className="border border-[#444] px-5 py-2">
+      BE
+      </th>
+
+      <th className="border border-[#444] px-5 py-2">
+      SL
+      </th>
+
+      <th className="border border-[#444] px-5 py-2">
+      Confianza
+      </th>
+
+      <th className="border border-[#444] px-5 py-2">
+      Momentum
+      </th>
+
+      <th className="border border-[#444] px-5 py-2">
+      Muestra
+      </th>
+
+      </tr>
+
+      </thead>
+
+      <tbody>
+
+      <tr>
+
+      <td className="border border-[#444] px-5 py-3 text-green-400 font-bold">
+
+      {(prediccion.tp*100).toFixed(1)}%
+
+      </td>
+
+      <td className="border border-[#444] px-5 py-3 text-yellow-400 font-bold">
+
+      {(prediccion.be*100).toFixed(1)}%
+
+      </td>
+
+      <td className="border border-[#444] px-5 py-3 text-red-400 font-bold">
+
+      {(prediccion.sl*100).toFixed(1)}%
+
+      </td>
+
+      <td className="border border-[#444] px-5 py-3">
+
+      {prediccion.confianza.toFixed(0)}%
+
+      </td>
+
+      <td
+      className={`border border-[#444] px-5 py-3 font-bold ${
+      prediccion.momentum>=0
+      ?"text-green-400"
+      :"text-red-400"
+      }`}
+      >
+
+      {prediccion.momentum.toFixed(1)}%
+
+      </td>
+
+      <td className="border border-[#444] px-5 py-3">
+
+      {prediccion.muestraContexto}
+
+      </td>
+
+      </tr>
+
+      </tbody>
+
+      </table>
+
+      </div>
       
+      <div
+        style={{
+            marginTop:20,
+            padding:20,
+            borderRadius:10,
+            background:"#1e1e1e",
+            border:"1px solid #444"
+        }}
+    >
+
+        <h3
+            style={{
+                marginBottom:10
+            }}
+        >
+            Recomendación
+        </h3>
+
+        <div
+            style={{
+                fontSize:32
+            }}
+        >
+            {"⭐".repeat(prediccion.estrellas)}
+        </div>
+
+        <div
+            style={{
+                fontSize:22,
+                fontWeight:"bold",
+                marginTop:10
+            }}
+        >
+            {prediccion.recomendacion}
+        </div>
+
+        <div
+            style={{
+                marginTop:10
+            }}
+        >
+            Score: <b>{prediccion.score.toFixed(1)}</b>/100
+        </div>
+
+      </div>
+
+        <div className="mt-6 flex justify-center">
+
+        <table className="border border-[#444] text-center">
+
+        <thead>
+
+        <tr className="bg-[#2c3e50]">
+
+        <th className="border border-[#444] px-4 py-2"></th>
+
+        <th className="border border-[#444] px-4 py-2">
+        Predicción
+        </th>
+
+        <th className="border border-[#444] px-4 py-2">
+        Histórico
+        </th>
+
+        <th className="border border-[#444] px-4 py-2">
+        Desviación
+        </th>
+
+        <th className="border border-[#444] px-4 py-2">
+        Interpretación
+        </th>
+
+        </tr>
+
+        </thead>
+
+        <tbody>
+
+        <tr>
+
+        <td className="border px-4 py-2 text-green-400 font-bold">
+        TP
+        </td>
+
+        <td className="border px-4 py-2">
+        {(prediccion.tp*100).toFixed(1)}%
+        </td>
+
+        <td className="border px-4 py-2">
+        {(prediccion.tpGlobal*100).toFixed(1)}%
+        </td>
+
+        <td
+        className={`border px-4 py-2 font-bold ${
+        deltaTP>0
+        ?"text-green-400"
+        :"text-red-400"
+        }`}
+        >
+
+        {deltaTP>0?"+":""}
+        {deltaTP.toFixed(1)}%
+
+        </td>
+
+        <td className="border px-4 py-2">
+        {interpretarVentaja(deltaTP,"TP")}
+        </td>
+
+        </tr>
+
+        <tr>
+
+        <td className="border px-4 py-2 text-yellow-400 font-bold">
+        BE
+        </td>
+
+        <td className="border px-4 py-2">
+        {(prediccion.be*100).toFixed(1)}%
+        </td>
+
+        <td className="border px-4 py-2">
+        {(prediccion.beGlobal*100).toFixed(1)}%
+        </td>
+
+        <td
+        className={`border px-4 py-2 font-bold ${
+        deltaBE<0
+        ?"text-green-400"
+        :"text-red-400"
+        }`}
+        >
+        {deltaBE>0?"+":""}
+        {deltaBE.toFixed(1)}%
+        </td>
+
+        <td className="border px-4 py-2">
+        {interpretarVentaja(deltaBE,"BE")}
+        </td>
+
+        </tr>
+
+        <tr>
+
+        <td className="border px-4 py-2 text-red-400 font-bold">
+        SL
+        </td>
+
+        <td className="border px-4 py-2">
+        {(prediccion.sl*100).toFixed(1)}%
+        </td>
+
+        <td className="border px-4 py-2">
+        {(prediccion.slGlobal*100).toFixed(1)}%
+        </td>
+
+        <td
+        className={`border px-4 py-2 font-bold ${
+        deltaSL<0
+        ?"text-green-400"
+        :"text-red-400"
+        }`}
+        >
+
+        {deltaSL>0?"+":""}
+        {deltaSL.toFixed(1)}%
+
+        </td>
+
+        <td className="border px-4 py-2">
+        {interpretarVentaja(deltaSL,"SL")}
+        </td>
+
+        </tr>
+
+        </tbody>
+
+        </table>
+
+        </div> 
+
+
     </div>
   );
 }
