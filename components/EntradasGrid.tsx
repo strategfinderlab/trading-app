@@ -112,7 +112,13 @@ export default function TestGrid() {
     // 🔥 3. calcular MIX + SL/TP
     return newData.map(row => {
 
-      const mejor = mejores[row["Día semana"]];
+      const contabilizar =
+        String(row["Contabilizar"]).trim().toUpperCase() === "SI";
+
+      const mejor =
+        contabilizar
+          ? mejores[row["Día semana"]]
+          : null;
 
       const raw = mejor ? row[mejor] : null;
 
