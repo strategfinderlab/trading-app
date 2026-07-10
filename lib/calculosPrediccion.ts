@@ -1,5 +1,6 @@
 import { reconstruirMix } from "./calculosEstadisticas";
-
+const MIN_MUESTRAS_PATRON = 5;
+const MAX_LONGITUD_PATRON = 6;
 export interface Prediccion {
   tp: number;
   be: number;
@@ -19,6 +20,15 @@ export interface Prediccion {
   tpGlobal: number;
   beGlobal: number;
   slGlobal: number;
+  patronDetectado: string[];
+  longitudPatron: number;
+  muestraPatron: number;
+
+  tpPatronPct: number;
+  bePatronPct: number;
+  slPatronPct: number;
+
+  pesoPatron: number;
 }
 
 function pesoReciente(indice: number) {
@@ -122,9 +132,128 @@ export function calcularPrediccion(
 
   data = reconstruirMix(data);
 
-  const df = data.filter(
-    r => String(r["Contabilizar"]).toUpperCase() === "SI"
-  );
+  const df = data.filter(r => {
+
+    const contabilizar =
+      String(r["Contabilizar"]).toUpperCase() === "SI";
+
+    const finalizada =
+      String(r["Link después"] ?? "").trim() !== "";
+
+    return contabilizar && finalizada;
+
+  });
+
+  // ==================== PATRÓN DE RESULTADOS ====================
+
+ const dataPatron = df
+    .filter(r => {
+
+      const valor = r[estrategia];
+
+      return (
+        valor !== "" &&
+        valor !== null &&
+        valor !== undefined &&
+        !isNaN(Number(valor))
+      );
+
+    })
+    .sort(
+      (a, b) =>
+        new Date(a["Fecha"]).getTime() -
+        new Date(b["Fecha"]).getTime()
+    );
+  const resultados = dataPatron.map(r => {
+
+    const v = Number(r[estrategia]);
+
+    if (v > 0) return "TP";
+    if (v < 0) return "SL";
+    return "BE";
+
+  });
+  const patronActual = resultados.slice(-MAX_LONGITUD_PATRON);
+  let patronDetectado: string[] = [];
+  let longitudPatron = 0;
+
+  let tpPatron = 0;
+  let bePatron = 0;
+  let slPatron = 0;
+
+  let muestraPatron = 0;
+
+  for (
+      let n = Math.min(MAX_LONGITUD_PATRON, patronActual.length);
+      n >= 1;
+      n--
+  ) {
+
+      const patron = patronActual.slice(-n);
+
+      let tp = 0;
+      let be = 0;
+      let sl = 0;
+
+      for (let i = 0; i <= resultados.length - n - 1; i++) {
+
+          const secuencia = resultados.slice(i, i + n);
+
+          if (JSON.stringify(secuencia) !== JSON.stringify(patron))
+              continue;
+
+          const siguiente = resultados[i + n];
+
+          if (siguiente === "TP") tp++;
+          else if (siguiente === "BE") be++;
+          else sl++;
+
+      }
+
+      const total = tp + be + sl;
+
+      if (total >= MIN_MUESTRAS_PATRON || n === 1) {
+
+          patronDetectado = [...patron];
+
+          longitudPatron = n;
+
+          tpPatron = tp;
+          bePatron = be;
+          slPatron = sl;
+
+          muestraPatron = total;
+
+          break;
+
+      }
+
+  }
+
+  const totalPatron = tpPatron + bePatron + slPatron;
+
+  const tpPatronPct =
+    totalPatron > 0 ? tpPatron / totalPatron : 0;
+
+  const bePatronPct =
+    totalPatron > 0 ? bePatron / totalPatron : 0;
+
+  const slPatronPct =
+    totalPatron > 0 ? slPatron / totalPatron : 0;
+
+  let pesoPatron = 0;
+
+  if (muestraPatron >= 30)
+    pesoPatron = 1;
+
+  else if (muestraPatron >= 15)
+    pesoPatron = 0.75;
+
+  else if (muestraPatron >= 8)
+    pesoPatron = 0.40;
+
+  else
+    pesoPatron = 0;
 
   const serieTotal = df
     .map(r => Number(r[estrategia]))
@@ -228,21 +357,25 @@ export function calcularPrediccion(
 
   const wGlobal = 1 - wContexto - wReciente;
 
+  const wRestante = 1 - pesoPatron;
+
   let tp =
-    global.tp * wGlobal +
+    (global.tp * wGlobal +
     reciente.tp * wReciente +
-    tpBayes * wContexto;
+    tpBayes * wContexto) * wRestante +
+    tpPatronPct * pesoPatron;
 
   let be =
-    global.be * wGlobal +
+    (global.be * wGlobal +
     reciente.be * wReciente +
-    beBayes * wContexto;
+    beBayes * wContexto) * wRestante +
+    bePatronPct * pesoPatron;
 
   let sl =
-    global.sl * wGlobal +
+    (global.sl * wGlobal +
     reciente.sl * wReciente +
-    slBayes * wContexto;
-
+    slBayes * wContexto) * wRestante +
+    slPatronPct * pesoPatron;
   const suma = tp + be + sl;
 
   tp /= suma;
@@ -360,7 +493,17 @@ export function calcularPrediccion(
       score,
       estrellas,
       recomendacion,
-      sinHistorico
+      sinHistorico,
+
+      patronDetectado,
+      longitudPatron,
+      muestraPatron,
+
+      tpPatronPct,
+      bePatronPct,
+      slPatronPct,
+
+      pesoPatron
 
   };
 

@@ -649,8 +649,8 @@ export default function EstadisticasPage() {
         >
             Score: <b>{prediccion.score.toFixed(1)}</b>/100
         </div>
-
-      </div>
+      
+       </div>
 
         <div className="mt-6 flex justify-center">
 
@@ -787,6 +787,111 @@ export default function EstadisticasPage() {
 
         </div> 
 
+              <div
+        className="mt-8 mx-auto"
+        style={{
+          maxWidth: 700,
+          background: "#1b1b1b",
+          border: "1px solid #444",
+          borderRadius: 10,
+          padding: 20
+        }}
+      >
+
+      <h3 className="text-xl font-bold text-[#d4af37] mb-4">
+      🧩 Patrón detectado
+      </h3>
+
+      <div className="text-center text-3xl mb-6">
+
+      {prediccion.patronDetectado.length > 0
+        ? prediccion.patronDetectado.join(" ➜ ")
+        : "Sin patrón"}
+
+      </div>
+
+      <div className="flex justify-center">
+
+      <table className="border border-[#444] text-center">
+
+      <thead>
+
+      <tr className="bg-[#2c3e50]">
+
+      <th className="border px-4 py-2">
+      TP
+      </th>
+
+      <th className="border px-4 py-2">
+      BE
+      </th>
+
+      <th className="border px-4 py-2">
+      SL
+      </th>
+
+      <th className="border px-4 py-2">
+      Muestra
+      </th>
+
+      <th className="border px-4 py-2">
+      Influencia
+      </th>
+
+      </tr>
+
+      </thead>
+
+      <tbody>
+
+      <tr>
+
+      <td className="border px-4 py-2 text-green-400 font-bold">
+      {(prediccion.tpPatronPct*100).toFixed(1)}%
+      </td>
+
+      <td className="border px-4 py-2 text-yellow-400 font-bold">
+      {(prediccion.bePatronPct*100).toFixed(1)}%
+      </td>
+
+      <td className="border px-4 py-2 text-red-400 font-bold">
+      {(prediccion.slPatronPct*100).toFixed(1)}%
+      </td>
+
+      <td className="border px-4 py-2">
+      {prediccion.muestraPatron}
+      </td>
+
+      <td className="border px-4 py-2">
+
+      {prediccion.pesoPatron===1
+      ?"⭐⭐⭐⭐⭐"
+
+      :prediccion.pesoPatron>=0.75
+      ?"⭐⭐⭐⭐"
+
+      :prediccion.pesoPatron>=0.4
+      ?"⭐⭐⭐"
+
+      :"⭐"}
+
+      </td>
+
+      </tr>
+
+      </tbody>
+
+      </table>
+
+      </div>
+
+      <p className="text-center text-gray-400 mt-4">
+
+      Se han buscado en el histórico todas las veces que apareció exactamente esta secuencia de resultados y se ha calculado cuál fue el resultado de la operación siguiente.
+
+      </p>
+
+      </div>
 
     </div>
   );
