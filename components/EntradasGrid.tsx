@@ -122,7 +122,7 @@ export default function TestGrid() {
 
       const raw = mejor ? row[mejor] : "";
 
-      let mix: number | string = "";
+      let mix: number | null = null;
 
       if (
         raw !== "" &&
@@ -135,7 +135,7 @@ export default function TestGrid() {
 
       let sltp = "";
 
-      if (mix !== "") {
+      if (mix !== null) {
         if (mix > 0) {
           sltp = "TP";
         } else if (mix < 0) {
