@@ -1,4 +1,3 @@
-import { reconstruirMix } from "./calculosEstadisticas";
 const MIN_MUESTRAS_PATRON = 5;
 const MAX_LONGITUD_PATRON = 6;
 export interface Prediccion {
@@ -120,6 +119,27 @@ function pesoContexto(n: number) {
 
 }
 
+function parseFecha(fecha: string) {
+  if (!fecha) return new Date(0);
+
+  const [datePart, timePart] = fecha.split(" ");
+
+  if (!datePart) return new Date(0);
+
+  const [day, month, year] = datePart.split("/").map(Number);
+
+  let hours = 0;
+  let minutes = 0;
+
+  if (timePart) {
+    const parts = timePart.split(":");
+    hours = Number(parts[0]) || 0;
+    minutes = Number(parts[1]) || 0;
+  }
+
+  return new Date(year, month - 1, day, hours, minutes);
+}
+
 export function calcularPrediccion(
 
   data: any[],
@@ -130,7 +150,12 @@ export function calcularPrediccion(
 
 ): Prediccion {
 
-  data = reconstruirMix(data);
+  const ultimasMix = data
+    .filter(r =>
+      String(r["Contabilizar"]).toUpperCase() === "SI" &&
+      String(r["Link después"] ?? "").trim() !== ""
+    )
+    .slice(-10);
 
   const df = data.filter(r => {
 
@@ -138,7 +163,7 @@ export function calcularPrediccion(
       String(r["Contabilizar"]).toUpperCase() === "SI";
 
     const finalizada =
-      String(r["Link después"] ?? "").trim() !== "";
+     String(r["SL/TP"] ?? "").trim() !== "";
 
     return contabilizar && finalizada;
 
@@ -160,19 +185,41 @@ export function calcularPrediccion(
 
     })
     .sort(
-      (a, b) =>
-        new Date(a["Fecha"]).getTime() -
-        new Date(b["Fecha"]).getTime()
+        (a,b)=>
+        parseFecha(a["Fecha"]).getTime() -
+        parseFecha(b["Fecha"]).getTime()
     );
-  const resultados = dataPatron.map(r => {
 
-    const v = Number(r[estrategia]);
+  let resultados: string[];
 
-    if (v > 0) return "TP";
-    if (v < 0) return "SL";
-    return "BE";
+  if (estrategia === "MIX") {
 
-  });
+      resultados = data
+          .filter(r =>
+              String(r["Contabilizar"]).toUpperCase() === "SI" &&
+              String(r["SL/TP"] ?? "").trim() !== ""
+          )
+          .sort(
+              (a, b) =>
+                  parseFecha(a["Fecha"]).getTime() -
+                  parseFecha(b["Fecha"]).getTime()
+          )
+          .map(r => String(r["SL/TP"]).trim());
+
+  } else {
+
+      resultados = dataPatron.map(r => {
+
+          const v = Number(r[estrategia]);
+
+          if (v > 0) return "TP";
+          if (v < 0) return "SL";
+          return "BE";
+
+      });
+
+  }
+
   const patronActual = resultados.slice(-MAX_LONGITUD_PATRON);
   let patronDetectado: string[] = [];
   let longitudPatron = 0;
@@ -182,11 +229,12 @@ export function calcularPrediccion(
   let slPatron = 0;
 
   let muestraPatron = 0;
+  let mejorScore = -1;
 
   for (
-      let n = Math.min(MAX_LONGITUD_PATRON, patronActual.length);
-      n >= 1;
-      n--
+      let n = 1;
+      n <= Math.min(MAX_LONGITUD_PATRON, patronActual.length);
+      n++
   ) {
 
       const patron = patronActual.slice(-n);
@@ -201,7 +249,7 @@ export function calcularPrediccion(
 
           if (JSON.stringify(secuencia) !== JSON.stringify(patron))
               continue;
-
+          
           const siguiente = resultados[i + n];
 
           if (siguiente === "TP") tp++;
@@ -212,7 +260,22 @@ export function calcularPrediccion(
 
       const total = tp + be + sl;
 
-      if (total >= MIN_MUESTRAS_PATRON || n === 1) {
+      if (total === 0) continue;
+
+      const probabilidad = Math.max(tp, be, sl) / total;
+
+      // puntuación del patrón
+      const score =
+        probabilidad *
+        Math.sqrt(total) *
+        Math.pow(n, 1.5);
+
+      if (
+          (total >= MIN_MUESTRAS_PATRON || n === 1) &&
+          score > mejorScore
+      ) {
+
+          mejorScore = score;
 
           patronDetectado = [...patron];
 
@@ -224,12 +287,9 @@ export function calcularPrediccion(
 
           muestraPatron = total;
 
-          break;
-
       }
 
   }
-
   const totalPatron = tpPatron + bePatron + slPatron;
 
   const tpPatronPct =

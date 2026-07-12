@@ -120,20 +120,29 @@ export default function TestGrid() {
           ? mejores[row["Día semana"]]
           : null;
 
-      const raw = mejor ? row[mejor] : null;
+      const raw = mejor ? row[mejor] : "";
 
-      const num = Number(raw);
+      let mix: number | string = "";
 
-      const val =
-        raw === null || raw === undefined || raw === "" || isNaN(num)
-          ? null
-          : num;
-
-      const mix = val ?? "";
+      if (
+        raw !== "" &&
+        raw !== null &&
+        raw !== undefined &&
+        !isNaN(Number(raw))
+      ) {
+        mix = Number(raw);
+      }
 
       let sltp = "";
-      if (val !== null) {
-        sltp = val >= 0 ? "TP" : "SL";
+
+      if (mix !== "") {
+        if (mix > 0) {
+          sltp = "TP";
+        } else if (mix < 0) {
+          sltp = "SL";
+        } else {
+          sltp = "BE";
+        }
       }
 
       return {
@@ -364,7 +373,8 @@ export default function TestGrid() {
 
             // 🔥 AÑADE ESTO SOLO PARA MIX
             valueGetter: key === "MIX"
-              ? (params: any) => params.data["MIX"] || ""
+              ? (params: any) =>
+                  params.data["MIX"] ?? ""
               : undefined,
 
             valueFormatter: key === "MIX"
