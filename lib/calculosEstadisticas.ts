@@ -56,14 +56,6 @@ export const reconstruirMix = (data: any[]) => {
 
   return clean.map(row => {
 
-    // Solo las operaciones contabilizadas forman parte del MIX
-    if (String(row["Contabilizar"]).toUpperCase() !== "SI") {
-      return {
-        ...row,
-        MIX: null
-      };
-    }
-
     const mejor = mejores[row["Día semana"]];
 
     let mix: number | null = null;

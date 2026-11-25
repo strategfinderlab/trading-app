@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -12,13 +13,20 @@ const DuracionChart = dynamic(
   () => import("../../../components/charts/DuracionChart"),
   { ssr: false }
 );
-import { getStrategies, calcularMejores } from "../../../lib/calculos";
-import { normalizarDia } from "../../../lib/calculos";
+
+const MixDiaMesChart = dynamic(
+  () => import("../../../components/charts/MixDiaMesChart"),
+  { ssr: false }
+);
+
+import { getStrategies, calcularMejores, normalizarDia } from "../../../lib/calculos";
+
 export default function AnalisisPage() {
 
   const [data, setData] = useState<any[]>([]);
   const [estrategias, setEstrategias] = useState<string[]>([]);
   const [mejores, setMejores] = useState<Record<string, string>>({});
+
   const procesarDatos = (d: any[]) => {
 
     if (!Array.isArray(d)) return;
@@ -58,6 +66,7 @@ export default function AnalisisPage() {
       <h2 className="text-2xl font-bold mb-6 border-b border-[#d4af37] pb-2">
         📉 Análisis por Tamaño SL
       </h2>
+
       <SLChart
         data={data}
         estrategias={["MIX", ...Object.values(mejores).filter(Boolean)]}
@@ -66,10 +75,17 @@ export default function AnalisisPage() {
       <h2 className="text-2xl font-bold mt-12 mb-6 border-b border-[#d4af37] pb-2">
         ⏱️ Análisis por Duración
       </h2>
+
       <DuracionChart
         data={data}
         mejores={mejores}
       />
+
+      <h2 className="text-2xl font-bold mt-12 mb-6 border-b border-[#d4af37] pb-2">
+        📅 Análisis MIX por día del mes
+      </h2>
+
+      <MixDiaMesChart data={data} />
 
     </div>
   );

@@ -26,11 +26,14 @@ export function calcularMontecarlo(
 
   // 🔥 equity (igual que streamlit)
   const equityPaths = paths.map(p => {
+
     let acc = 1;
+
     return p.map(r => {
-      acc += r;
+      acc *= (1 + r);
       return acc;
     });
+
   });
 
   // helpers
